@@ -15,6 +15,6 @@ runs:
   using: "composite"
   steps:
     - run: |
-        curl -o /usr/bin/hadolint -sSL "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version }}/hadolint-Linux-${{ inputs.cpuarch }}" \
-        chmod 0755 /usr/bin/hadolint
+        curl -o /usr/local/bin/hadolint -sSL "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version }}/hadolint-Linux-${{ inputs.cpuarch }}"
+        chmod 0755 /usr/local/bin/hadolint
       shell: bash
