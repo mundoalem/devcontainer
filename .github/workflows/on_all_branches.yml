@@ -12,6 +12,7 @@ jobs:
     name: Lint
     steps:
       - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup-hadolint
       - run: |
           source .envrc
           make lint
