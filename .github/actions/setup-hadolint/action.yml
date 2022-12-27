@@ -1,0 +1,20 @@
+name: Setup Hadolint
+description: Setup hadolint.
+
+inputs:
+  cpuarch:
+    description: The platform of the binary to be downloaded
+    required: false
+    default: amd64
+  version:
+    description: Version to be downloaded
+    required: false
+    default: 2.12.0
+
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        curl -o /usr/bin/hadolint -sSL "https://github.com/hadolint/hadolint/releases/download/v${{ inputs.version }}/hadolint-Linux-${{ inputs.cpuarch }}" \
+        chmod 0755 /usr/bin/hadolint
+      shell: bash
