@@ -5,7 +5,8 @@ inputs:
   cpuarch:
     description: The platform of the binary to be downloaded
     required: false
-    default: amd64
+    default: x86_64
+
   version:
     description: Version to be downloaded
     required: false
