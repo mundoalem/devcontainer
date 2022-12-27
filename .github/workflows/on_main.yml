@@ -1,0 +1,42 @@
+name: Workflow - On Main Branch
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  lint:
+    runs-on: ubuntu-22.04
+    name: Lint
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make lint
+
+  build:
+    runs-on: ubuntu-22.04
+    name: Build
+    needs: lint
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make build
+
+  test:
+    runs-on: ubuntu-22.04
+    name: Test
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make test
+
+  scan:
+    runs-on: ubuntu-22.04
+    name: Scan
+    needs: test
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          make scan

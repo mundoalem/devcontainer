@@ -1,0 +1,188 @@
+# #################################################################################################
+#
+# This file is part of container-dev-base.
+#
+# The container-dev-base is free software: you can redistribute it and/or modify it under the terms
+# of the GNU Affero General Public License as published by the Free Software Foundation, either
+# version 3 of the License, or (at your option) any later version.
+#
+# The container-dev-base is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
+# PURPOSE. See the GNU General Public License for more details.
+#
+# You should have received a copy of the GNU Affero General Public License along with
+# container-dev-base. If not, see <https://www.gnu.org/licenses/>.
+#
+# #################################################################################################
+
+schemaVersion: 2.0.0
+
+commandTests:
+  - name: 'docker compose'
+    command: 'docker'
+    args: ['compose', 'version']
+    expectedOutput: ['^Docker Compose version']
+
+  - name: 'developers is the primary group'
+    command: 'id'
+    args: ['mundoalem']
+    expectedOutput: ['gid=[0-9]+\(developers\)']
+
+  - name: 'sudo is a secondary group'
+    command: 'id'
+    args: ['mundoalem']
+    expectedOutput: ['groups=.*[0-9]+\(sudo\)']
+
+  - name: 'docker is a secondary group'
+    command: 'id'
+    args: ['mundoalem']
+    expectedOutput: ['groups=.*[0-9]+\(docker\)']
+
+fileContentTests:
+  - name: 'mundoalem user'
+    path: '/etc/passwd'
+    expectedContents: ['.*mundoalem:x:.*']
+
+  - name: 'docker group'
+    path: '/etc/group'
+    expectedContents: ['.*docker:x:.*']
+
+  - name: 'sudo configuration'
+    path: '/etc/sudoers.d/developers'
+    expectedContents: ['%developers ALL=\(ALL\) NOPASSWD: ALL']
+
+fileExistenceTests:
+  - name: 'checkov'
+    path: '/home/mundoalem/.local/bin/checkov'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'curl'
+    path: '/usr/bin/curl'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'delta'
+    path: '/usr/bin/delta'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'direnv'
+    path: '/usr/bin/direnv'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'docker'
+    path: '/usr/bin/docker'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'git'
+    path: '/usr/bin/git'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'gpg'
+    path: '/usr/bin/gpg'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'hadolint'
+    path: '/usr/local/bin/hadolint'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'make'
+    path: '/usr/bin/make'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'pip3'
+    path: '/usr/bin/pip3'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+  - name: 'python3'
+    path: '/usr/bin/python3'
+    shouldExist: true
+    permissions: 'Lrwxrwxrwx'
+
+  - name: 'sudo'
+    path: '/usr/bin/sudo'
+    shouldExist: true
+    permissions: 'urwxr-xr-x'
+
+  - name: 'unzip'
+    path: '/usr/bin/unzip'
+    shouldExist: true
+    permissions: '-rwxr-xr-x'
+
+metadataTest:
+  envVars:
+    - key: LANG
+      value: C.UTF-8
+    - key: LANGUAGE
+      value: C.UTF-8
+    - key: LC_ALL
+      value: C.UTF-8
+  labels:
+    - key: 'org.opencontainers.artifact.created'
+      value: '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}$'
+      isRegex: true
+
+    - key: 'org.opencontainers.artifact.description'
+      value: '^.+$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.authors'
+      value: '^.+$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.base.digest'
+      value: '^[0-9a-zA-Z]{64}$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.base.name'
+      value: '^.+$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.created'
+      value: '^[0-9]{4}-[0-9]{2}-[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2}\+[0-9]{2}:[0-9]{2}$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.description'
+      value: '^.+$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.documentation'
+      value: '^(https?://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.licenses'
+      value: '^.+$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.revision'
+      value: '^[0-9a-zA-Z]{40}$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.source'
+      value: '^(https?://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.title'
+      value: '^.+$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.url'
+      value: '^(https?://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.vendor'
+      value: '^.+$'
+      isRegex: true
+
+    - key: 'org.opencontainers.image.version'
+      value: '^.+$'
+      isRegex: true
+  user: "mundoalem"
