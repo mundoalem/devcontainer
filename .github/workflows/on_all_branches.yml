@@ -13,6 +13,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
+          source .envrc
           make lint
 
   test:
@@ -22,4 +23,5 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: |
+          source .envrc
           make test
