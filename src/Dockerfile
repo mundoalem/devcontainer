@@ -138,9 +138,9 @@ RUN locale-gen "${DEFAULT_LANG}" \
 
 RUN curl -sSL --http1.1 -o /tmp/docker-ce-cli.deb "https://download.docker.com/linux/ubuntu/dists/jammy/pool/stable/${TARGETARCH}/docker-ce-cli_20.10.21~3-0~ubuntu-jammy_${TARGETARCH}.deb" \
     && dpkg -i /tmp/docker-ce-cli.deb \
-    && rm -f /tmp/docker-ce-cli.deb \
     && curl -sSL --http1.1 -o /tmp/docker-compose-plugin.deb "https://download.docker.com/linux/ubuntu/dists/jammy/pool/stable/${TARGETARCH}/docker-compose-plugin_2.12.2~ubuntu-jammy_${TARGETARCH}.deb" \
     && dpkg -i /tmp/docker-compose-plugin.deb \
+    && rm -f /tmp/docker-ce-cli.deb \
     && rm -f /tmp/docker-compose-plugin.deb \
     && groupadd docker
 
