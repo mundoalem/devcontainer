@@ -34,7 +34,7 @@ TESTS_DIR := $(abspath ${ROOT_DIR}/tests)
 #
 
 PROJECT_NAME ?= $(error PROJECT_NAME is not set)
-PROJECT_VERSION ?= $(error PROJECT_VERSION is not set)
+PROJECT_VERSION ?= "0.0.0"
 PROJECT_BUILD_DATE ?= $(shell date --rfc-3339=seconds)
 PROJECT_COMMIT ?= $(shell git rev-parse HEAD)
 
