@@ -141,6 +141,8 @@ scan:
 
 .PHONY: test
 test: build
+	@docker image ls
+
 	@container-structure-test test \
 		--image "$(PROJECT_NAME):$(PROJECT_VERSION)" \
 		--config "$(TESTS_DIR)/tests.yaml"
