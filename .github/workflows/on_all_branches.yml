@@ -11,9 +11,12 @@ jobs:
     runs-on: ubuntu-22.04
     name: Lint
     steps:
-      - uses: actions/checkout@v2
-      - uses: ./.github/actions/setup-hadolint
-      - run: |
+      - name: Checkout Source Code
+        uses: actions/checkout@v2
+      - name: Setup Hadolint
+        uses: ./.github/actions/setup-hadolint
+      - name: Run Lint
+        run: |
           source .envrc
           make lint
 
@@ -22,7 +25,16 @@ jobs:
     name: Test
     needs: lint
     steps:
-      - uses: actions/checkout@v2
-      - run: |
+      - name: Checkout Source Code
+        uses: actions/checkout@v2
+      - name: Setup QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+      - name: Setup Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Run Test
+        run: |
           source .envrc
           make test
