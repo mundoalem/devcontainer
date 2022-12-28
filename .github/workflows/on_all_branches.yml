@@ -6,18 +6,23 @@ on:
       - '**'
       - '!main'
 
+env:
+  PROJECT_DOCKER_PLATFORMS: "linux/arm64,linux/amd64"
+  PROJECT_DOCKER_USER: "mundoalemio"
+  PROJECT_DOCKER_REPOSITORY: "dev-base"
+  PROJECT_NAME: "container-dev-base"
+
 jobs:
   lint:
     runs-on: ubuntu-22.04
     name: Lint
     steps:
-      - name: Checkout Source Code
+      - name: Checkout source code
         uses: actions/checkout@v2
-      - name: Setup Hadolint
+      - name: Set up hadolint
         uses: ./.github/actions/setup-hadolint
-      - name: Run Lint
+      - name: Run lint
         run: |
-          source .envrc
           make lint
 
   test:
@@ -25,16 +30,17 @@ jobs:
     name: Test
     needs: lint
     steps:
-      - name: Checkout Source Code
+      - name: Checkout source code
         uses: actions/checkout@v2
-      - name: Setup QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         with:
           image: tonistiigi/binfmt:latest
           platforms: all
-      - name: Setup Docker Buildx
+      - name: Set up docker buildx
         uses: docker/setup-buildx-action@v1
-      - name: Run Test
+      - name: Set up container-structure-test
+        uses: ./.github/actions/setup-hadolint
+      - name: Run test
         run: |
-          source .envrc
           make test

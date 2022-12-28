@@ -1,0 +1,21 @@
+name: Setup container-structure-test
+description: Setup container-structure-test.
+
+inputs:
+  cpuarch:
+    description: The platform of the binary to be downloaded
+    required: false
+    default: amd64
+
+  version:
+    description: Version to be downloaded
+    required: false
+    default: 1.14.0
+
+runs:
+  using: "composite"
+  steps:
+    - run: |
+        curl -sSL --http1.1 -o /usr/local/bin/container-structure-test "https://storage.googleapis.com/container-structure-test/v${{ inputs.version }}/container-structure-test-linux-${{ inputs.cpuarch }}"
+        chmod +x /usr/local/bin/container-structure-test
+      shell: bash
