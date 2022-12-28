@@ -42,5 +42,7 @@ jobs:
       - name: Set up container-structure-test
         uses: ./.github/actions/setup-hadolint
       - name: Run test
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/amd64
         run: |
           make test
