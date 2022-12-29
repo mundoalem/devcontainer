@@ -20,6 +20,12 @@
 # #################################################################################################
 
 #
+# Make
+#
+
+SHELL := /bin/bash
+
+#
 # Directories
 #
 
@@ -67,29 +73,24 @@ all: lint build scan test
 
 .PHONY: build
 build:
-	@docker buildx inspect \
-		--bootstrap \
-		--builder "$(PROJECT_DOCKER_BUILDER)" 2>&1 >/dev/null \
-	|| docker buildx create \
-		--bootstrap \
-		--name "$(PROJECT_DOCKER_BUILDER)" \
-		--platform "$(PROJECT_DOCKER_PLATFORMS)" \
-		--use
-
-	@docker buildx build \
-		--build-arg PROJECT_BUILD_DATE="$(PROJECT_BUILD_DATE)" \
-		--build-arg PROJECT_COMMIT="$(PROJECT_COMMIT)" \
-		--build-arg PROJECT_VERSION="$(PROJECT_VERSION)" \
-		--build-arg DEFAULT_LANG="$(DEFAULT_LANG)" \
-		--build-arg DEFAULT_USER_PRIMARY_GROUP="$(DEFAULT_USER_PRIMARY_GROUP)" \
-		--build-arg DEFAULT_USER_SECONDARY_GROUPS="$(DEFAULT_USER_SECONDARY_GROUPS)" \
-		--build-arg DEFAULT_USER_SHELL="$(DEFAULT_USER_SHELL)" \
-		--build-arg DEFAULT_USER="$(DEFAULT_USER)" \
-		--builder "$(PROJECT_DOCKER_BUILDER)" \
-		--file "$(SOURCE_DIR)/Dockerfile" \
-		--platform "$(PROJECT_DOCKER_PLATFORMS)" \
-		--tag "$(PROJECT_NAME):$(PROJECT_VERSION)" \
-		.
+	@for platform in $${PROJECT_DOCKER_PLATFORMS//,/ }; do \
+		cpuarch="$$(echo $$platform | cut -d/ -f2)"; \
+		docker build \
+			--build-arg PROJECT_BUILD_DATE="$(PROJECT_BUILD_DATE)" \
+			--build-arg PROJECT_COMMIT="$(PROJECT_COMMIT)" \
+			--build-arg PROJECT_VERSION="$(PROJECT_VERSION)" \
+			--build-arg DEFAULT_LANG="$(DEFAULT_LANG)" \
+			--build-arg DEFAULT_USER_PRIMARY_GROUP="$(DEFAULT_USER_PRIMARY_GROUP)" \
+			--build-arg DEFAULT_USER_SECONDARY_GROUPS="$(DEFAULT_USER_SECONDARY_GROUPS)" \
+			--build-arg DEFAULT_USER_SHELL="$(DEFAULT_USER_SHELL)" \
+			--build-arg DEFAULT_USER="$(DEFAULT_USER)" \
+			--file "$(SOURCE_DIR)/Dockerfile" \
+			--platform "$$platform" \
+			--tag "$(PROJECT_NAME):$(PROJECT_VERSION)-$$cpuarch" \
+			.; \
+		docker manifest create "$(PROJECT_NAME):$(PROJECT_VERSION)" \
+			--amend "$(PROJECT_NAME):$(PROJECT_VERSION)-$$cpuarch"; \
+	done
 
 .PHONY: clean
 clean:
@@ -141,8 +142,6 @@ scan:
 
 .PHONY: test
 test: build
-	@docker image ls
-
 	@container-structure-test test \
 		--image "$(PROJECT_NAME):$(PROJECT_VERSION)" \
 		--config "$(TESTS_DIR)/tests.yaml"
