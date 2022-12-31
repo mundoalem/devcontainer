@@ -7,6 +7,7 @@ on:
       - '!main'
 
 env:
+  DOCKER_BUILDKIT: 1
   PROJECT_DOCKER_PLATFORMS: "linux/arm64,linux/amd64"
   PROJECT_DOCKER_USER: "mundoalemio"
   PROJECT_DOCKER_REPOSITORY: "dev-base"
