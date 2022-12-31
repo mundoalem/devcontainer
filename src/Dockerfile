@@ -115,6 +115,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     python3 \
     python3-pip \
     software-properties-common \
+    ssh \
     sudo \
     unzip \
     && apt-get autoremove -y \
