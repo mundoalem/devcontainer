@@ -1,0 +1,18 @@
+name: Setup checkov
+description: Setup checkov.
+
+inputs:
+  version:
+    description: Version to be downloaded
+    required: false
+    default: 2.2.201
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/setup-python@v4
+      with:
+        python-version: 3.10
+    - run: |
+        pip3 install --no-cache-dir "checkov==2.2.201"
+      shell: bash
