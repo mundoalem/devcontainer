@@ -229,7 +229,7 @@ RUN echo "eval \"\$(direnv hook bash)\"" >> $HOME/.bashrc \
 # INSTALL PYTHON TOOLS
 #
 
-RUN pip3 install --no-cache-dir "checkov==2.2.201"
+RUN pip3 install --no-cache-dir "checkov==2.2.224"
 
 # ######################################################################################################################
 # COMMAND / ENTRYPOINT
