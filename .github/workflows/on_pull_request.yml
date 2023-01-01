@@ -19,7 +19,7 @@ jobs:
     name: Lint
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up hadolint
         uses: ./.github/actions/setup-hadolint
       - name: Run lint
@@ -31,7 +31,7 @@ jobs:
     name: Scan
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up checkov
         uses: ./.github/actions/setup-checkov
       - name: Run scan
@@ -46,16 +46,14 @@ jobs:
       - scan
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker
         uses: docker/setup-buildx-action@v2
-      - name: Set up container-structure-test
-        uses: ./.github/actions/setup-container-structure-test
       - name: Run build
         run: |
-          make test
+          make build
 
   test:
     runs-on: ubuntu-22.04
@@ -63,7 +61,7 @@ jobs:
     needs: build
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker
