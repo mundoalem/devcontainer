@@ -1,0 +1,35 @@
+{
+	"name": "container-dev-base",
+	"remoteUser": "mundoalem",
+
+	"build": {
+		"dockerfile": "../src/Dockerfile",
+		"context": ".."
+	},
+
+	"settings": {
+		"editor.defaultFormatter": "ms-azuretools.vscode-docker",
+		"editor.formatOnSave": true,
+		"editor.rulers": [
+			80,
+			120
+		],
+		"git.enableCommitSigning": true,
+		"terminal.integrated.profiles.linux": {
+			"bash": {
+				"path": "/usr/bin/bash"
+			}
+		},
+		"terminal.integrated.defaultProfile.linux": "bash"
+	},
+
+	"extensions": [
+		"eamodio.gitlens",
+		"ms-azuretools.vscode-docker"
+	],
+
+	"mounts": [
+		"type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock",
+		"type=bind,consistency=cached,source=${localWorkspaceFolder}/.tmp/history,target=/home/mundoalem/.history"
+	]
+}
