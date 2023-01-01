@@ -26,10 +26,24 @@ jobs:
         run: |
           make lint
 
+  scan:
+    runs-on: ubuntu-22.04
+    name: Scan
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+      - name: Set up checkov
+        uses: ./.github/actions/setup-checkov
+      - name: Run scan
+        run: |
+          make scan
+
   build:
     runs-on: ubuntu-22.04
     name: Build
-    needs: lint
+    needs:
+      - lint
+      - scan
     steps:
       - name: Checkout source code
         uses: actions/checkout@v2
@@ -61,15 +75,3 @@ jobs:
           PROJECT_DOCKER_PLATFORMS: linux/amd64
         run: |
           make test
-
-  scan:
-    runs-on: ubuntu-22.04
-    name: Lint
-    steps:
-      - name: Checkout source code
-        uses: actions/checkout@v2
-      - name: Set up checkov
-        uses: ./.github/actions/setup-checkov
-      - name: Run scan
-        run: |
-          make scan
