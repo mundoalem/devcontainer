@@ -49,11 +49,12 @@ PROJECT_COMMIT ?= $(shell git rev-parse HEAD)
 #
 
 PROJECT_DOCKER_BUILDER := builder-$(PROJECT_NAME)
-PROJECT_DOCKER_PASSWORD ?=
+PROJECT_DOCKER_PASSWORD ?= $(warning PROJECT_DOCKER_PASSWORD is not set)
 PROJECT_DOCKER_PLATFORMS ?= linux/arm64,linux/amd64
+PROJECT_DOCKER_TEST_ARCH ?= arm64
 PROJECT_DOCKER_REPOSITORY ?= $(PROJECT_NAME)
 PROJECT_DOCKER_SERVER ?=
-PROJECT_DOCKER_USER ?= $(error PROJECT_DOCKER_USER is not set)
+PROJECT_DOCKER_USER ?= $(warning PROJECT_DOCKER_USER is not set)
 
 #
 # Image Arguments
@@ -74,7 +75,7 @@ all: lint build scan test
 .PHONY: build
 build:
 	@for platform in $${PROJECT_DOCKER_PLATFORMS//,/ }; do \
-		cpuarch="$$(echo $$platform | cut -d/ -f2)"; \
+		arch="$$(echo $$platform | cut -d/ -f2)"; \
 		docker build \
 			--build-arg PROJECT_BUILD_DATE="$(PROJECT_BUILD_DATE)" \
 			--build-arg PROJECT_COMMIT="$(PROJECT_COMMIT)" \
@@ -86,10 +87,8 @@ build:
 			--build-arg DEFAULT_USER="$(DEFAULT_USER)" \
 			--file "$(SOURCE_DIR)/Dockerfile" \
 			--platform "$$platform" \
-			--tag "$(PROJECT_NAME):$(PROJECT_VERSION)-$$cpuarch" \
+			--tag "$(PROJECT_NAME):$(PROJECT_VERSION)-$$arch" \
 			.; \
-		docker manifest create "$(PROJECT_NAME):$(PROJECT_VERSION)" \
-			--amend "$(PROJECT_NAME):$(PROJECT_VERSION)-$$cpuarch"; \
 	done
 
 .PHONY: clean
@@ -143,5 +142,5 @@ scan:
 .PHONY: test
 test: build
 	@container-structure-test test \
-		--image "$(PROJECT_NAME):$(PROJECT_VERSION)" \
+		--image "$(PROJECT_NAME):$(PROJECT_VERSION)-$(PROJECT_DOCKER_TEST_ARCH)" \
 		--config "$(TESTS_DIR)/tests.yaml"
