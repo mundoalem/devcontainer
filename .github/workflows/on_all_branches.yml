@@ -8,10 +8,11 @@ on:
 
 env:
   DOCKER_BUILDKIT: 1
-  PROJECT_DOCKER_PLATFORMS: "linux/arm64,linux/amd64"
-  PROJECT_DOCKER_USER: "mundoalemio"
-  PROJECT_DOCKER_REPOSITORY: "dev-base"
-  PROJECT_NAME: "container-dev-base"
+  PROJECT_DOCKER_PLATFORMS: linux/arm64,linux/amd64
+  PROJECT_DOCKER_TEST_ARCH: amd64
+  PROJECT_DOCKER_USER: mundoalemio
+  PROJECT_DOCKER_REPOSITORY: dev-base
+  PROJECT_NAME: container-dev-base
 
 jobs:
   lint:
@@ -35,7 +36,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      - name: Set up docker buildx
+      - name: Set up Docker
         uses: docker/setup-buildx-action@v2
       - name: Set up container-structure-test
         uses: ./.github/actions/setup-container-structure-test
