@@ -101,8 +101,8 @@ lint:
 
 .PHONY: release
 release:
-	@echo "$(PROJECT_DOCKER_PASSWORD)" | wc -c
-	@echo "$(PROJECT_DOCKER_USER)"
+	@echo "$(PROJECT_DOCKER_PASSWORD)"
+
 	@echo "$(PROJECT_DOCKER_PASSWORD)" \
 	| docker login \
 			--username "$(PROJECT_DOCKER_USER)" \
