@@ -101,11 +101,14 @@ lint:
 
 .PHONY: release
 release:
-	@docker login \
-		--username "$(PROJECT_DOCKER_USER)" \
-		--password "$(PROJECT_DOCKER_PASSWORD)" \
-		$(PROJECT_DOCKER_SERVER)
-	
+	@echo "$(PROJECT_DOCKER_PASSWORD)" | wc -c
+	@echo "$(PROJECT_DOCKER_USER)"
+	@echo "$(PROJECT_DOCKER_PASSWORD)" \
+	| docker login \
+			--username "$(PROJECT_DOCKER_USER)" \
+			--password-stdin \
+			$(PROJECT_DOCKER_SERVER)
+
 	@docker buildx build \
 		--build-arg PROJECT_BUILD_DATE="$(PROJECT_BUILD_DATE)" \
 		--build-arg PROJECT_COMMIT="$(PROJECT_COMMIT)" \

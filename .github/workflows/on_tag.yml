@@ -89,5 +89,4 @@ jobs:
         env:
           PROJECT_DOCKER_PASSWORD: $env:DOCKERHUB_ACCESS_TOKEN
         run: |
-          echo -n $PROJECT_DOCKER_PASSWORD | wc -c
           make release
