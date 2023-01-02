@@ -87,6 +87,6 @@ jobs:
         uses: docker/setup-buildx-action@v2
       - name: Run release
         env:
-          PROJECT_DOCKER_PASSWORD: $env:DOCKERHUB_ACCESS_TOKEN
+          PROJECT_DOCKER_PASSWORD: ${{ env.DOCKERHUB_ACCESS_TOKEN }}
         run: |
           make release
