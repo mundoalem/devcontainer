@@ -107,6 +107,15 @@ release:
 		--password-stdin \
 		$(PROJECT_DOCKER_SERVER)
 
+	@docker buildx inspect \
+		--bootstrap \
+		--builder "$(PROJECT_DOCKER_BUILDER)" 2>&1 >/dev/null \
+	|| docker buildx create \
+		--bootstrap \
+		--name "$(PROJECT_DOCKER_BUILDER)" \
+		--platform "$(PROJECT_DOCKER_PLATFORMS)" \
+		--use
+
 	@docker buildx build \
 		--build-arg PROJECT_BUILD_DATE="$(PROJECT_BUILD_DATE)" \
 		--build-arg PROJECT_COMMIT="$(PROJECT_COMMIT)" \
