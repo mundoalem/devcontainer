@@ -1,4 +1,4 @@
-# #################################################################################################
+# ######################################################################################################################
 #
 # This file is part of container-dev-base.
 #
@@ -13,11 +13,11 @@
 # You should have received a copy of the GNU Affero General Public License along with
 # container-dev-base. If not, see <https://www.gnu.org/licenses/>.
 #
-# #################################################################################################
+# ######################################################################################################################
 
-# #################################################################################################
+# ######################################################################################################################
 # VARIABLES
-# #################################################################################################
+# ######################################################################################################################
 
 #
 # Make
@@ -34,6 +34,12 @@ CONFIG_DIR := $(abspath ${ROOT_DIR}/config)
 POLICIES_DIR := $(abspath ${ROOT_DIR}/policies)
 SOURCE_DIR := $(abspath ${ROOT_DIR}/src)
 TESTS_DIR := $(abspath ${ROOT_DIR}/tests)
+
+#
+# Docker
+#
+
+DOCKER_TOKEN ?= $(warning DOCKER_TOKEN is not set)
 
 #
 # Project: General
@@ -66,9 +72,9 @@ DEFAULT_USER_SECONDARY_GROUPS ?= sudo,docker
 DEFAULT_USER_SHELL ?= /bin/bash
 DEFAULT_USER ?= mundoalem
 
-# #################################################################################################
+# ######################################################################################################################
 # TARGETS
-# #################################################################################################
+# ######################################################################################################################
 
 all: lint build scan test
 
@@ -101,11 +107,10 @@ lint:
 
 .PHONY: release
 release:
-	@echo "$(PROJECT_DOCKER_PASSWORD)" \
-	| docker login \
-			--username "$(PROJECT_DOCKER_USER)" \
-			--password-stdin \
-			$(PROJECT_DOCKER_SERVER)
+	@docker login \
+		--username "$(PROJECT_DOCKER_USER)" \
+		--password-stdin \
+		$(PROJECT_DOCKER_SERVER)
 
 	@docker buildx build \
 		--build-arg PROJECT_BUILD_DATE="$(PROJECT_BUILD_DATE)" \
