@@ -36,12 +36,6 @@ SOURCE_DIR := $(abspath ${ROOT_DIR}/src)
 TESTS_DIR := $(abspath ${ROOT_DIR}/tests)
 
 #
-# Docker
-#
-
-DOCKER_TOKEN ?= $(warning DOCKER_TOKEN is not set)
-
-#
 # Project: General
 #
 
@@ -106,8 +100,9 @@ lint:
 	@hadolint "$(SOURCE_DIR)/Dockerfile"
 
 .PHONY: release
-release:
-	@docker login \
+release: 
+	@echo "$(PROJECT_DOCKER_PASSWORD)" \
+	| docker login \
 		--username "$(PROJECT_DOCKER_USER)" \
 		--password-stdin \
 		$(PROJECT_DOCKER_SERVER)
