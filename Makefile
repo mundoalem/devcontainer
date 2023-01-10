@@ -39,10 +39,10 @@ TESTS_DIR := $(abspath ${ROOT_DIR}/tests)
 # Project: General
 #
 
-PROJECT_NAME ?= $(error PROJECT_NAME is not set)
-PROJECT_VERSION ?= "0.0.0"
 PROJECT_BUILD_DATE ?= $(shell date --rfc-3339=seconds)
 PROJECT_COMMIT ?= $(shell git rev-parse HEAD)
+PROJECT_NAME ?= $(error PROJECT_NAME is not set)
+PROJECT_VERSION ?= $(if $(shell git rev-list --tags --max-count=1), $(shell git describe --tags `git rev-list --tags --max-count=1`), $(PROJECT_COMMIT))
 
 #
 # Project: Docker
