@@ -63,6 +63,7 @@ ARG DEFAULT_USER_PRIMARY_GROUP="developers"
 ARG DEFAULT_USER_SECONDARY_GROUPS="sudo,docker"
 ARG DEFAULT_USER_SHELL="/bin/bash"
 ARG DEFAULT_USER="mundoalem"
+ARG DEFAULT_WORKSPACE_DIR="/workspaces"
 
 # ######################################################################################################################
 # LABELS
@@ -137,9 +138,9 @@ RUN locale-gen "${DEFAULT_LANG}" \
 # INSTALL: DOCKER
 #
 
-RUN curl -sSL --http1.1 -o /tmp/docker-ce-cli.deb "https://download.docker.com/linux/ubuntu/dists/jammy/pool/stable/${TARGETARCH}/docker-ce-cli_20.10.21~3-0~ubuntu-jammy_${TARGETARCH}.deb" \
+RUN curl -sSL --http1.1 -o /tmp/docker-ce-cli.deb "https://download.docker.com/linux/ubuntu/dists/jammy/pool/stable/${TARGETARCH}/docker-ce-cli_20.10.22~3-0~ubuntu-jammy_${TARGETARCH}.deb" \
     && dpkg -i /tmp/docker-ce-cli.deb \
-    && curl -sSL --http1.1 -o /tmp/docker-compose-plugin.deb "https://download.docker.com/linux/ubuntu/dists/jammy/pool/stable/${TARGETARCH}/docker-compose-plugin_2.12.2~ubuntu-jammy_${TARGETARCH}.deb" \
+    && curl -sSL --http1.1 -o /tmp/docker-compose-plugin.deb "https://download.docker.com/linux/ubuntu/dists/jammy/pool/stable/${TARGETARCH}/docker-compose-plugin_2.14.1~ubuntu-jammy_${TARGETARCH}.deb" \
     && dpkg -i /tmp/docker-compose-plugin.deb \
     && rm -f /tmp/docker-ce-cli.deb \
     && rm -f /tmp/docker-compose-plugin.deb \
@@ -221,6 +222,12 @@ RUN mkdir "${HOME}/.history" \
 RUN echo "eval \"\$(direnv hook bash)\"" >> $HOME/.bashrc \
     && echo "direnv allow /workspaces/*" >> $HOME/.bashrc
 
+#
+# CONFIGURE GIT
+#
+
+RUN git config --global --add safe.directory "${DEFAULT_WORKSPACE_DIR}"
+
 # ######################################################################################################################
 # SETUP: USER TOOLS
 # ######################################################################################################################
@@ -229,7 +236,7 @@ RUN echo "eval \"\$(direnv hook bash)\"" >> $HOME/.bashrc \
 # INSTALL PYTHON TOOLS
 #
 
-RUN pip3 install --no-cache-dir "checkov==2.2.224"
+RUN pip3 install --no-cache-dir "checkov==2.2.257"
 
 # ######################################################################################################################
 # COMMAND / ENTRYPOINT

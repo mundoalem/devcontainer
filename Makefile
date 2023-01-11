@@ -42,7 +42,7 @@ TESTS_DIR := $(abspath ${ROOT_DIR}/tests)
 PROJECT_BUILD_DATE ?= $(shell date --rfc-3339=seconds)
 PROJECT_COMMIT ?= $(shell git rev-parse HEAD)
 PROJECT_NAME ?= $(error PROJECT_NAME is not set)
-PROJECT_VERSION ?= $(if $(shell git rev-list --tags --max-count=1), $(shell git describe --tags `git rev-list --tags --max-count=1`), $(PROJECT_COMMIT))
+PROJECT_VERSION ?= $(if $(shell git rev-list --tags --max-count=1), $(shell git describe --tags `git rev-list --tags --max-count=1`), $(shell git rev-parse --short HEAD))
 
 #
 # Project: Docker
@@ -65,6 +65,7 @@ DEFAULT_USER_PRIMARY_GROUP ?= developers
 DEFAULT_USER_SECONDARY_GROUPS ?= sudo,docker
 DEFAULT_USER_SHELL ?= /bin/bash
 DEFAULT_USER ?= mundoalem
+DEFAULT_WORKSPACE_DIR ?= /workspaces
 
 # ######################################################################################################################
 # TARGETS
@@ -85,6 +86,7 @@ build:
 			--build-arg DEFAULT_USER_SECONDARY_GROUPS="$(DEFAULT_USER_SECONDARY_GROUPS)" \
 			--build-arg DEFAULT_USER_SHELL="$(DEFAULT_USER_SHELL)" \
 			--build-arg DEFAULT_USER="$(DEFAULT_USER)" \
+			--build-arg DEFAULT_WORKSPACE_DIR="$(DEFAULT_WORKSPACE_DIR)" \
 			--file "$(SOURCE_DIR)/Dockerfile" \
 			--platform "$$platform" \
 			--tag "$(PROJECT_NAME):$(PROJECT_VERSION)-$$arch" \
@@ -125,6 +127,7 @@ release:
 		--build-arg DEFAULT_USER_SECONDARY_GROUPS="$(DEFAULT_USER_SECONDARY_GROUPS)" \
 		--build-arg DEFAULT_USER_SHELL="$(DEFAULT_USER_SHELL)" \
 		--build-arg DEFAULT_USER="$(DEFAULT_USER)" \
+		--build-arg DEFAULT_WORKSPACE_DIR="$(DEFAULT_WORKSPACE_DIR)" \
 		--builder "$(PROJECT_DOCKER_BUILDER)" \
 		--file "$(SOURCE_DIR)/Dockerfile" \
 		--tag "$(PROJECT_DOCKER_USER)/$(PROJECT_DOCKER_REPOSITORY):$(PROJECT_VERSION)" \
