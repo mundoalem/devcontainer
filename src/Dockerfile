@@ -63,7 +63,6 @@ ARG DEFAULT_USER_PRIMARY_GROUP="developers"
 ARG DEFAULT_USER_SECONDARY_GROUPS="sudo,docker"
 ARG DEFAULT_USER_SHELL="/bin/bash"
 ARG DEFAULT_USER="mundoalem"
-ARG DEFAULT_WORKSPACE_DIR="/workspaces"
 
 # ######################################################################################################################
 # LABELS
@@ -107,7 +106,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     direnv \
     git \
     git-extras \
-    gnupg \
+    gnupg2 \
     gpg-agent \
     locales \
     lsb-release \
@@ -221,12 +220,6 @@ RUN mkdir "${HOME}/.history" \
 
 RUN echo "eval \"\$(direnv hook bash)\"" >> $HOME/.bashrc \
     && echo "direnv allow /workspaces/*" >> $HOME/.bashrc
-
-#
-# CONFIGURE GIT
-#
-
-RUN git config --global --add safe.directory "${DEFAULT_WORKSPACE_DIR}"
 
 # ######################################################################################################################
 # SETUP: USER TOOLS

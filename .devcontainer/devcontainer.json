@@ -1,5 +1,6 @@
 {
 	"name": "container-dev-base",
+	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
 	"remoteUser": "mundoalem",
 
 	"build": {
