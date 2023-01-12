@@ -62,7 +62,7 @@ ARG DEFAULT_LANG="C.UTF-8"
 ARG DEFAULT_USER_PRIMARY_GROUP="developers"
 ARG DEFAULT_USER_SECONDARY_GROUPS="sudo,docker"
 ARG DEFAULT_USER_SHELL="/bin/bash"
-ARG DEFAULT_USER="mundoalem"
+ARG DEFAULT_USER="dev"
 
 # ######################################################################################################################
 # LABELS

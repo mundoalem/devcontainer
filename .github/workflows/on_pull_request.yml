@@ -7,11 +7,10 @@ on:
 
 env:
   DOCKER_BUILDKIT: 1
-  PROJECT_DOCKER_PLATFORMS: linux/arm64,linux/amd64
-  PROJECT_DOCKER_TEST_ARCH: amd64
-  PROJECT_DOCKER_USER: mundoalemio
-  PROJECT_DOCKER_REPOSITORY: dev-base
-  PROJECT_NAME: container-dev-base
+  PROJECT_DOCKER_PLATFORMS: ${{ vars.PROJECT_DOCKER_PLATFORMS }}
+  PROJECT_DOCKER_TEST_ARCH: ${{ vars.PROJECT_DOCKER_TEST_ARCH }}
+  PROJECT_DOCKER_REPOSITORY: ${{ vars.PROJECT_DOCKER_REPOSITORY }}
+  PROJECT_NAME: ${{ vars.PROJECT_NAME }}
 
 jobs:
   lint:
@@ -69,7 +68,5 @@ jobs:
       - name: Set up container-structure-test
         uses: ./.github/actions/setup-container-structure-test
       - name: Run test
-        env:
-          PROJECT_DOCKER_PLATFORMS: linux/amd64
         run: |
           make test

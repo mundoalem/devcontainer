@@ -64,7 +64,7 @@ DEFAULT_LANG ?= C.UTF-8
 DEFAULT_USER_PRIMARY_GROUP ?= developers
 DEFAULT_USER_SECONDARY_GROUPS ?= sudo,docker
 DEFAULT_USER_SHELL ?= /bin/bash
-DEFAULT_USER ?= mundoalem
+DEFAULT_USER ?= dev
 
 # ######################################################################################################################
 # TARGETS
