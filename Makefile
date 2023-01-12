@@ -74,6 +74,8 @@ all: lint build scan test
 
 .PHONY: build
 build:
+	@echo "\"$(PROJECT_VERSION)\""
+
 	@for platform in $${PROJECT_DOCKER_PLATFORMS//,/ }; do \
 		arch="$$(echo $$platform | cut -d/ -f2)"; \
 		docker build \
