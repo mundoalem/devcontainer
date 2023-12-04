@@ -1,4 +1,7 @@
 ignored:
-  - DL3008
-  - DL3059
-  - DL4006
+  - DL3008 # Pin versions in apt get install
+  - DL3050 # Superfluous label(s) present
+  - DL3059 # Multiple consecutive `RUN` instructions
+failure-threshold: style
+format: tty
+strict-labels: true

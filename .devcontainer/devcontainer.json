@@ -1,36 +1,47 @@
 {
-	"name": "container-dev-base",
-	"postStartCommand": "git config --global --add safe.directory ${containerWorkspaceFolder}",
-	"remoteUser": "dev",
+    "name": "container-dev-base",
+    "postStartCommand": "./.devcontainer/hooks/post_start.sh",
+    "remoteUser": "dev",
 
-	"build": {
-		"dockerfile": "../src/Dockerfile",
-		"context": ".."
-	},
+    "build": {
+        "dockerfile": "../src/Dockerfile",
+        "context": ".."
+    },
 
-	"settings": {
-		"editor.defaultFormatter": "ms-azuretools.vscode-docker",
-		"editor.formatOnSave": true,
-		"editor.rulers": [
-			80,
-			120
-		],
-		"git.enableCommitSigning": true,
-		"terminal.integrated.profiles.linux": {
-			"bash": {
-				"path": "/usr/bin/bash"
-			}
-		},
-		"terminal.integrated.defaultProfile.linux": "bash"
-	},
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "eamodio.gitlens",
+                "EditorConfig.EditorConfig",
+                "jetmartin.bats",
+                "ms-azuretools.vscode-docker",
+                "MS-vsliveshare.vsliveshare",
+                "VisualStudioExptTeam.intellicode-api-usage-examples"
+                
+            ],
+            "settings": {
+                "editor.defaultFormatter": "ms-azuretools.vscode-docker",
+                "editor.formatOnSave": true,
+                "editor.rulers": [
+                    80,
+                    120,
+                    170
+                ],
+                "git.enableCommitSigning": true,
+                "terminal.integrated.defaultProfile.linux": "bash",
+                "terminal.integrated.profiles.linux": {
+                    "bash": {
+                        "path": "/usr/bin/bash"
+                    }
+                },
+                "terminal.integrated.shellIntegration.decorationsEnabled": "never"
+            }
+        }
+        
+    },
 
-	"extensions": [
-		"eamodio.gitlens",
-		"ms-azuretools.vscode-docker"
-	],
-
-	"mounts": [
-		"type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock",
-		"type=bind,consistency=cached,source=${localWorkspaceFolder}/.tmp/history,target=/home/mundoalem/.history"
-	]
+    "mounts": [
+        "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock",
+        "type=bind,consistency=cached,source=${localWorkspaceFolder}/.tmp/history,target=/home/dev/.history"
+    ]
 }
