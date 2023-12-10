@@ -10,25 +10,19 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
-    container:
-      image: ubuntu-23.04
-      env:
-        PROJECT_NAME: ${{ vars.PROJECT_NAME }}
-        PROJECT_DOCKER_USER: ${{ vars.PROJECT_DOCKER_USER }}
-        URL_HADOLINT: https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-Linux-${TARGETARCH}
     name: Lint
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout source code
+      - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Checkout source code
+      - name: Prepare
         uses: mundoalem/action-prepare@initial
         with:
           type: container
           step: lint
 
-      - name: Run lint
+      - name: Lint
         run: |
           make lint
 
