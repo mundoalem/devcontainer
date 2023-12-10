@@ -24,6 +24,7 @@ jobs:
 
       - name: Lint
         run: |
+          export PROJECT_NAME="dev-base"
           make lint
 
 
