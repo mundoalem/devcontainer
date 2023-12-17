@@ -165,7 +165,7 @@ scan:
 
 .PHONY: reset
 reset: clean
-	@ echo "Removing builder $(PROJECT_DOCKER_BUILDER)"
+	@echo "Removing builder $(PROJECT_DOCKER_BUILDER)"
 	@docker buildx inspect \
 	    --bootstrap \
 		--builder "$(PROJECT_DOCKER_BUILDER)" >/dev/null 2>&1 \
