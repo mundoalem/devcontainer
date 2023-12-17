@@ -1,10 +1,16 @@
+[![Release Status](https://github.com/mundoalem/container-dev-base/actions/workflows/on_release_tags.yml/badge.svg)](https://github.com/mundoalem/container-dev-base/actions/workflows/on_release_tags.yml)
+
 # container-dev-base
 
-This project defines a base container image to be used as a development environment inside
-[Visual Studio Code](https://code.visualstudio.com/) through the
-[Remote Dev Container](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
-extension.
+This project defines a base container image to be used as a development environment inside [Visual Studio Code](https://code.visualstudio.com/)
+through the [Remote Dev Container](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
-## Documentation
+# Documentation
 
-Please, refer to the repository's wiki for further information on how to use this image.
+Please, refer to the repository's [wiki](https://github.com/mundoalem/container-dev-base/wiki) for further information
+on how to get started with this project.
+
+# License
+
+[GNU Affero General Public License Version 3](https://github.com/mundoalem/container-dev-base/blob/main/LICENSE)
+
