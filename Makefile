@@ -57,9 +57,7 @@ PROJECT_VERSION ?= $(strip \
 
 PROJECT_DOCKER_BUILDER := builder-$(PROJECT_NAME)
 PROJECT_DOCKER_PLATFORMS ?= linux/arm64,linux/amd64
-PROJECT_DOCKER_TEST_ARCH ?= arm64
 PROJECT_DOCKER_REPOSITORY ?= $(PROJECT_NAME)
-PROJECT_DOCKER_SCOUT_SEVERITY ?= critical,high
 PROJECT_DOCKER_USER ?= $(warning PROJECT_DOCKER_USER is not set)
 
 #
@@ -165,7 +163,7 @@ scan:
 
 .PHONY: reset
 reset: clean
-	@ echo "Removing builder $(PROJECT_DOCKER_BUILDER)"
+	@echo "Removing builder $(PROJECT_DOCKER_BUILDER)"
 	@docker buildx inspect \
 	    --bootstrap \
 		--builder "$(PROJECT_DOCKER_BUILDER)" >/dev/null 2>&1 \
