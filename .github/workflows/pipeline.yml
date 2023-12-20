@@ -76,11 +76,27 @@ jobs:
         run: |
           make scan
 
-      - name: Build
+      - name: Build (amd64)
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/amd64
         run: |
           make build
 
-      - name: Test
+      - name: Build (arm64)
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/arm64
+        run: |
+          make build
+
+      - name: Test (amd64)
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/amd64
+        run: |
+          make test
+
+      - name: Test (arm64)
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/arm64
         run: |
           make test
   cd:
@@ -99,5 +115,7 @@ jobs:
           job: cd
 
       - name: Release
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/amd64,linux/arm64
         run: |
           make release
