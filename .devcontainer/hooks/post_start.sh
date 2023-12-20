@@ -47,5 +47,4 @@ ls -d /workspaces/* | xargs git config --global --add safe.directory
 # ----------------------------------------------------------------------------------------------------------------------
 
 starship preset plain-text-symbols -o ~/.config/starship.toml
-starship config line_break.disabled true
 starship config container.disabled true
