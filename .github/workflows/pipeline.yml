@@ -123,5 +123,6 @@ jobs:
       - name: Release
         env:
           PROJECT_DOCKER_PLATFORMS: linux/amd64,linux/arm64
+          PROJECT_DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
         run: |
           make release
