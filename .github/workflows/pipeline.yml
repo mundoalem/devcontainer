@@ -102,7 +102,7 @@ jobs:
       - name: Get Platforms as JSON
         id: platforms
         run: |
-          echo "::set-output name=value::[\"$(echo '$PROJECT_DOCKER_PLATFORMS' | sed 's/,/\",\"/g')\"]"
+          echo "value=[\"$(echo $PROJECT_DOCKER_PLATFORMS | sed 's/,/\",\"/g')\"]" >> $GITHUB_OUTPUT
 
   ci:
     name: CI
