@@ -81,7 +81,7 @@ all: lint scan build test
 build:
 	@for platform in `echo ${PROJECT_DOCKER_PLATFORMS} | tr ',' ' '`; do \
 		arch="$$(echo $$platform | cut -d/ -f2)"; \
-		echo "Building $(PROJECT_DOCKER_REPOSITORY):$(PROJECT_VERSION)-$$arch"; \
+		echo "Building $(PROJECT_NAME):$(PROJECT_VERSION)-$$arch"; \
 		docker build \
 			--build-arg PROJECT_BUILD_DATE="$(PROJECT_BUILD_DATE)" \
 			--build-arg PROJECT_COMMIT="$(PROJECT_COMMIT)" \
@@ -93,7 +93,7 @@ build:
 			--build-arg DEFAULT_USER="$(DEFAULT_USER)" \
 			--file "$(SOURCE_DIR)/Dockerfile" \
 			--platform "$$platform" \
-			--tag "$(PROJECT_DOCKER_REPOSITORY):$(PROJECT_VERSION)-$$arch" \
+			--tag "$(PROJECT_NAME):$(PROJECT_VERSION)-$$arch" \
 			.; \
 	done
 
@@ -102,20 +102,20 @@ build:
 clean:
 	@for platform in `echo ${PROJECT_DOCKER_PLATFORMS} | tr ',' ' '`; do \
 		arch="$$(echo $$platform | cut -d/ -f2)"; \
-		echo "Removing $(PROJECT_DOCKER_REPOSITORY):$(PROJECT_VERSION)-$$arch"; \
+		echo "Removing $(PROJECT_NAME):$(PROJECT_VERSION)-$$arch"; \
 		docker images \
 			--quiet \
-			"$(PROJECT_DOCKER_REPOSITORY):$(PROJECT_VERSION)-$$arch" >/dev/null 2>&1 \
+			"$(PROJECT_NAME):$(PROJECT_VERSION)-$$arch" >/dev/null 2>&1 \
 		&& docker rmi \
 			--force \
-			"$(PROJECT_DOCKER_REPOSITORY):$(PROJECT_VERSION)-$$arch" >/dev/null 2>&1; \
-		echo "Removing $(PROJECT_DOCKER_REPOSITORY)-test:$$arch"; \
+			"$(PROJECT_NAME):$(PROJECT_VERSION)-$$arch" >/dev/null 2>&1; \
+		echo "Removing $(PROJECT_NAME)-test:$$arch"; \
 		docker images \
 			--quiet \
-			"$(PROJECT_DOCKER_REPOSITORY)-test:$$arch" >/dev/null 2>&1 \
+			"$(PROJECT_NAME)-test:$$arch" >/dev/null 2>&1 \
 		&& docker rmi \
 			--force \
-			"$(PROJECT_DOCKER_REPOSITORY)-test:$$arch" >/dev/null 2>&1; \
+			"$(PROJECT_NAME)-test:$$arch" >/dev/null 2>&1; \
 	done
 
 .PHONY: lint
@@ -175,15 +175,15 @@ reset: clean
 test:
 	@for platform in `echo ${PROJECT_DOCKER_PLATFORMS} | tr ',' ' '`; do \
 		arch="$$(echo $$platform | cut -d/ -f2)"; \
-		echo "Testing $(PROJECT_DOCKER_REPOSITORY)-test:$$arch"; \
+		echo "Testing $(PROJECT_NAME)-test:$$arch"; \
 		docker build \
 			--build-arg PROJECT_VERSION="$(PROJECT_VERSION)-$$arch" \
 			--file "$(SOURCE_DIR)/Dockerfile.test" \
 			--platform "$$platform" \
-			--tag "$(PROJECT_DOCKER_REPOSITORY)-test:$$arch" \
+			--tag "$(PROJECT_NAME)-test:$$arch" \
 			. \
 		&& docker run \
 			--platform "$$platform" \
 			--rm \
-			"$(PROJECT_DOCKER_REPOSITORY)-test:$$arch"; \
+			"$(PROJECT_NAME)-test:$$arch"; \
 	done
