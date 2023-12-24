@@ -147,6 +147,7 @@ release:
 		--build-arg DEFAULT_USER="$(DEFAULT_USER)" \
 		--builder "$(PROJECT_DOCKER_BUILDER)" \
 		--file "$(SOURCE_DIR)/Dockerfile" \
+		--platform "$(PROJECT_DOCKER_PLATFORMS)" \
 		--tag "$(PROJECT_DOCKER_ORG)/$(PROJECT_DOCKER_REPOSITORY):$(PROJECT_VERSION)" \
 		--tag "$(PROJECT_DOCKER_ORG)/$(PROJECT_DOCKER_REPOSITORY):latest" \
 		--push \
