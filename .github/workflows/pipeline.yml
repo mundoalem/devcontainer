@@ -48,8 +48,8 @@ on:
 
 env:
   DOCKER_BUILDKIT: 1
+  PROJECT_DOCKER_ORG: ${{ vars.PROJECT_DOCKER_ORG }}
   PROJECT_DOCKER_PLATFORMS: ${{ vars.PROJECT_DOCKER_PLATFORMS }}
-  PROJECT_DOCKER_REPOSITORY: ${{ vars.PROJECT_DOCKER_REPOSITORY }}
   PROJECT_NAME: ${{ vars.PROJECT_NAME }}
 
 # ######################################################################################################################
@@ -155,7 +155,5 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
       - name: Release
-        env:
-          PROJECT_DOCKER_USER: ${{ secrets.DOCKERHUB_USER }}
         run: |
           make release
