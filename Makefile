@@ -178,6 +178,7 @@ test:
 		arch="$$(echo $$platform | cut -d/ -f2)"; \
 		echo "Testing $(PROJECT_NAME)-test:$$arch"; \
 		docker build \
+			--build-arg PROJECT_NAME="$(PROJECT_NAME)" \
 			--build-arg PROJECT_VERSION="$(PROJECT_VERSION)-$$arch" \
 			--file "$(SOURCE_DIR)/Dockerfile.test" \
 			--platform "$$platform" \
