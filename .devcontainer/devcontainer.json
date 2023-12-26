@@ -1,6 +1,6 @@
 {
   "name": "container-dev-base",
-  "postStartCommand": "./.devcontainer/hooks/post_start.sh",
+  "postAttachCommand": "./.devcontainer/hooks/post_attach.sh",
   "remoteUser": "dev",
 
   "build": {
