@@ -1,4 +1,4 @@
-[![Release Status](https://github.com/mundoalem/container-dev-base/actions/workflows/pipeline.yml/badge.svg)](https://github.com/mundoalem/container-dev-base/actions/workflows/pipeline.yml)
+[![Release Status](https://github.com/mundoalem/devcontainer/actions/workflows/pipeline.yml/badge.svg)](https://github.com/mundoalem/devcontainer/actions/workflows/pipeline.yml)
 
 # Base Development Container
 
@@ -7,9 +7,9 @@ through the [Remote Dev Container](https://marketplace.visualstudio.com/items?it
 
 # Documentation
 
-Please, refer to the repository's [wiki](https://github.com/mundoalem/container-dev-base/wiki) for further information
+Please, refer to the repository's [wiki](https://github.com/mundoalem/devcontainer/wiki) for further information
 on how to get started with this project.
 
 # License
 
-[GNU Affero General Public License Version 3](https://github.com/mundoalem/container-dev-base/blob/main/LICENSE)
+[GNU Affero General Public License Version 3](https://github.com/mundoalem/devcontainer/blob/main/LICENSE)
