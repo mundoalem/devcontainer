@@ -118,6 +118,7 @@ SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 RUN export DEBIAN_FRONTEND="noninteractive" \
     && apt-get update \
     && apt-get -y install --no-install-recommends \
+    build-essential \
     ca-certificates \
     curl \
     direnv \
@@ -299,6 +300,25 @@ ENV PATH="${GOENV_ROOT}/bin:${PATH}"
 RUN git clone https://github.com/go-nv/goenv.git "${HOME}/.goenv" \
     && echo "eval \"\$(goenv init -)\"" >> "${HOME}/.bashrc" \
     && echo "export PATH=\"\$GOPATH/bin:\$GOROOT/bin:\$PATH\"" >> "${HOME}/.bashrc"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL PYENV
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV PYENV_ROOT="${HOME}/.pyenv"
+ENV PATH="${PYENV_ROOT}/bin:$PATH"
+
+#
+# INSTALL
+#
+
+RUN curl -fsSL https://pyenv.run | bash \
+    && echo "eval \"\$(pyenv init --path)\"" >> "${HOME}/.bashrc" \
+    && echo "eval \"\$(pyenv virtualenv-init -)\"" >> "${HOME}/.bashrc"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TOOLS
