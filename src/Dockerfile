@@ -138,6 +138,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     ssh \
     sudo \
     unzip \
+    vim \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
@@ -280,7 +281,8 @@ ENV HISTFILE="${HOME}/.history/.bash_history"
 
 RUN mkdir -p "${HOME}/.config" \
     && mkdir "${HOME}/.history" \
-    && touch "${HOME}/.history/.bash_history"
+    && touch "${HOME}/.history/.bash_history" \
+    && mkdir -p "${HOME}/.local/bin"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL GOENV
@@ -319,6 +321,26 @@ ENV PATH="${PYENV_ROOT}/bin:$PATH"
 RUN curl -fsSL https://pyenv.run | bash \
     && echo "eval \"\$(pyenv init --path)\"" >> "${HOME}/.bashrc" \
     && echo "eval \"\$(pyenv virtualenv-init -)\"" >> "${HOME}/.bashrc"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL TFENV
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV TFENV_ROOT="${HOME}/.tfenv"
+ENV PATH="${PYENV_ROOT}/bin:$PATH"
+
+#
+# INSTALL
+#
+
+RUN git clone --depth=1 https://github.com/tfutils/tfenv.git "${TFENV_ROOT}" \
+    && echo "export PATH=\"$HOME/.tfenv/bin:$PATH\"" >> "${HOME}/.bashrc" \
+    && ln -s "${HOME}/.tfenv/bin/"* "${HOME}/.local/bin"
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TOOLS
