@@ -99,6 +99,11 @@
     [ "$status" -eq 0 ]
 }
 
+@test "goenv is installed" {
+    run which goenv
+    [ "$status" -eq 0 ]
+}
+
 @test "gpg is installed" {
     run which gpg
     [ "$status" -eq 0 ]
@@ -116,6 +121,11 @@
 
 @test "make is installed" {
     run which git
+    [ "$status" -eq 0 ]
+}
+
+@test "pyenv is installed" {
+    run which pyenv
     [ "$status" -eq 0 ]
 }
 
