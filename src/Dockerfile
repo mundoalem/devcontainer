@@ -118,10 +118,13 @@ SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 RUN export DEBIAN_FRONTEND="noninteractive" \
     && apt-get update \
     && apt-get -y install --no-install-recommends \
+    binutils-aarch64-linux-gnu \
+    binutils-aarch64-linux-gnu-dbg \
     build-essential \
     ca-certificates \
     curl \
     direnv \
+    gcc-aarch64-linux-gnu \
     git \
     git-extras \
     gnupg2 \
@@ -130,10 +133,10 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     lsb-release \
     lsd \
     make \
+    pipx \
     pkg-config \
     python3 \
     python3-full \
-    pipx \
     software-properties-common \
     ssh \
     sudo \
@@ -142,6 +145,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE LOCALISATION

@@ -74,6 +74,21 @@
 # PACKAGES
 # ----------------------------------------------------------------------------------------------------------------------
 
+@test "aarch64-linux-gnu-as is installed" {
+    run which aarch64-linux-gnu-as
+    [ "$status" -eq 0 ]
+}
+
+@test "aarch64-linux-gnu-ld is installed" {
+    run which aarch64-linux-gnu-ld
+    [ "$status" -eq 0 ]
+}
+
+@test "aarch64-linux-gnu-objdump is installed" {
+    run which aarch64-linux-gnu-objdump
+    [ "$status" -eq 0 ]
+}
+
 @test "checkov is installed" {
     run which checkov
     [ "$status" -eq 0 ]
