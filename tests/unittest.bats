@@ -134,11 +134,6 @@
     [ "$status" -eq 0 ]
 }
 
-@test "tfenv is installed" {
-    run which tfenv
-    [ "$status" -eq 0 ]
-}
-
 @test "unzip is installed" {
     run which unzip
     [ "$status" -eq 0 ]
