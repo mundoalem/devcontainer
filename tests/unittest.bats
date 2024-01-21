@@ -74,11 +74,6 @@
 # PACKAGES
 # ----------------------------------------------------------------------------------------------------------------------
 
-@test "ansible is installed" {
-    run which ansible
-    [ "$status" -eq 0 ]
-}
-
 @test "checkov is installed" {
     run which checkov
     [ "$status" -eq 0 ]

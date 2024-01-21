@@ -1,14 +1,14 @@
 [![Release Status](https://github.com/mundoalem/devcontainer/actions/workflows/pipeline.yml/badge.svg)](https://github.com/mundoalem/devcontainer/actions/workflows/pipeline.yml)
 
-# Base Development Container
+# devcontainer
 
-This project defines a base container image to be used as a development environment inside [Visual Studio Code](https://code.visualstudio.com/)
+This project defines a container image to be used as a development environment inside [Visual Studio Code](https://code.visualstudio.com/)
 through the [Remote Dev Container](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension.
 
 # Documentation
 
-Please, refer to the repository's [wiki](https://github.com/mundoalem/devcontainer/wiki) for further information
-on how to get started with this project.
+Please, refer to the repository's [wiki](https://github.com/mundoalem/devcontainer/wiki) for further information on how
+to get started.
 
 # License
 

@@ -350,15 +350,13 @@ RUN git clone --depth=1 https://github.com/tfutils/tfenv.git "${TFENV_ROOT}" \
 # ENV
 #
 
-ENV VERSION_ANSIBLE="9.1.0"
 ENV VERSION_CHECKOV="3.1.67"
 
 #
 # PYTHON
 #
 
-RUN pipx install --include-deps "ansible==${VERSION_ANSIBLE}" \
-    && pipx install "checkov==${VERSION_CHECKOV}"
+RUN pipx install "checkov==${VERSION_CHECKOV}"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE DIRENV
