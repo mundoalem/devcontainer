@@ -129,6 +129,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     git-extras \
     gnupg2 \
     gpg-agent \
+    jq \
     libbz2-dev \
     libffi-dev \
     liblzma-dev \
