@@ -129,6 +129,15 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     git-extras \
     gnupg2 \
     gpg-agent \
+    libbz2-dev \
+    libffi-dev \
+    liblzma-dev \
+    libncursesw5-dev \
+    libreadline-dev \
+    libsqlite3-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxmlsec1-dev \
     locales \
     lsb-release \
     lsd \
@@ -140,12 +149,14 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     software-properties-common \
     ssh \
     sudo \
+    tk-dev \
     unzip \
     vim \
+    xz-utils \
+    zlib1g-dev \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
-
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE LOCALISATION
