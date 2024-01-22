@@ -3,17 +3,17 @@
 # ######################################################################################################################
 
 #
-# This file is part of container-dev-base.
+# This file is part of devcontainer.
 #
-# The container-dev-base is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+# The devcontainer is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
 # General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
 # option) any later version.
 #
-# The container-dev-base is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# The devcontainer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
 # implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License along with container-dev-base. If not, see
+# You should have received a copy of the GNU Affero General Public License along with devcontainer. If not, see
 # <https://www.gnu.org/licenses/>.
 #
 
@@ -90,18 +90,18 @@ ENV VERSION_UBUNTU_NAME="lunar"
 #
 
 LABEL org.opencontainers.artifact.created="${PROJECT_BUILD_DATE}"
-LABEL org.opencontainers.artifact.description="Base container image to be used as a development environment inside Visual Studio Code"
+LABEL org.opencontainers.artifact.description="Container image to be used as a remote development environment in Visual Studio Code"
 LABEL org.opencontainers.image.authors="Egon Braun <egon@mundoalem.io>"
-LABEL org.opencontainers.image.base.digest="51e70689b125fcc2e800f5efb7ba465dee85ede9da9c268ff5599053c7e52b77"
+LABEL org.opencontainers.image.base.digest="4783be26912a96818aa1c9468ea8acb5eff2608697f62deff67048595a613145"
 LABEL org.opencontainers.image.base.name="docker.io/library/ubuntu:${VERSION_UBUNTU}"
 LABEL org.opencontainers.image.created="${PROJECT_BUILD_DATE}"
-LABEL org.opencontainers.image.description="Base container image to be used as a development environment inside Visual Studio Code"
-LABEL org.opencontainers.image.documentation="https://hub.docker.com/r/mundoalemio/dev-base"
+LABEL org.opencontainers.image.description="Container image to be used as a remote development environment in Visual Studio Code"
+LABEL org.opencontainers.image.documentation="https://hub.docker.com/r/mundoalemio/devcontainer"
 LABEL org.opencontainers.image.licenses="AGPLv3"
 LABEL org.opencontainers.image.revision="${PROJECT_COMMIT}"
-LABEL org.opencontainers.image.source="https://github.com/mundoalem/container-dev-base"
+LABEL org.opencontainers.image.source="https://github.com/mundoalem/devcontainer"
 LABEL org.opencontainers.image.title="dev-base"
-LABEL org.opencontainers.image.url="https://hub.docker.com/r/mundoalemio/dev-base"
+LABEL org.opencontainers.image.url="https://hub.docker.com/r/mundoalemio/devcontainer"
 LABEL org.opencontainers.image.vendor="Mundoalem"
 LABEL org.opencontainers.image.version="${PROJECT_VERSION}"
 
@@ -118,9 +118,13 @@ SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 RUN export DEBIAN_FRONTEND="noninteractive" \
     && apt-get update \
     && apt-get -y install --no-install-recommends \
+    binutils-aarch64-linux-gnu \
+    binutils-aarch64-linux-gnu-dbg \
+    build-essential \
     ca-certificates \
     curl \
     direnv \
+    gcc-aarch64-linux-gnu \
     git \
     git-extras \
     gnupg2 \
@@ -129,17 +133,19 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     lsb-release \
     lsd \
     make \
+    pipx \
     pkg-config \
     python3 \
     python3-full \
-    pipx \
     software-properties-common \
     ssh \
     sudo \
     unzip \
+    vim \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
+
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE LOCALISATION
@@ -164,20 +170,17 @@ RUN locale-gen "${DEFAULT_LANG}" \
 # ENV
 #
 
-ENV VERSION_DOCKER_CLI="24.0.7-1"
-ENV VERSION_DOCKER_BUILDX_PLUGIN="0.11.2-1"
-ENV VERSION_DOCKER_COMPOSE_PLUGIN="2.21.0-1"
-ENV VERSION_DOCKER_SCOUT="1.0.9"
+ENV VERSION_DOCKER_CLI="25.0.0-1"
+ENV VERSION_DOCKER_BUILDX_PLUGIN="0.12.1-1"
+ENV VERSION_DOCKER_COMPOSE_PLUGIN="2.24.1-1"
 ENV FILENAME_DOCKER_SUFFIX="ubuntu.${VERSION_UBUNTU}~${VERSION_UBUNTU_NAME}_${TARGETARCH}.deb"
 ENV FILENAME_DOCKER_CLI="docker-ce-cli_${VERSION_DOCKER_CLI}~${FILENAME_DOCKER_SUFFIX}"
 ENV FILENAME_DOCKER_BUILDX_PLUGIN="docker-buildx-plugin_${VERSION_DOCKER_BUILDX_PLUGIN}~${FILENAME_DOCKER_SUFFIX}"
 ENV FILENAME_DOCKER_COMPOSE_PLUGIN="docker-compose-plugin_${VERSION_DOCKER_COMPOSE_PLUGIN}~${FILENAME_DOCKER_SUFFIX}"
-ENV FILENAME_DOCKER_SCOUT_PLUGIN="docker-scout_${VERSION_DOCKER_SCOUT}_linux_${TARGETARCH}.tar.gz"
 ENV URL_DOCKER_BASE="https://download.docker.com/linux/ubuntu/dists/${VERSION_UBUNTU_NAME}/pool/stable/${TARGETARCH}"
 ENV URL_DOCKER_CLI="${URL_DOCKER_BASE}/${FILENAME_DOCKER_CLI}"
 ENV URL_DOCKER_BUILDX_PLUGIN="${URL_DOCKER_BASE}/${FILENAME_DOCKER_BUILDX_PLUGIN}"
 ENV URL_DOCKER_COMPOSE_PLUGIN="${URL_DOCKER_BASE}/${FILENAME_DOCKER_COMPOSE_PLUGIN}"
-ENV URL_DOCKER_SCOUT_PLUGIN="https://github.com/docker/scout-cli/releases/download/v${VERSION_DOCKER_SCOUT}/${FILENAME_DOCKER_SCOUT_PLUGIN}"
 
 #
 # INSTALL
@@ -186,14 +189,11 @@ ENV URL_DOCKER_SCOUT_PLUGIN="https://github.com/docker/scout-cli/releases/downlo
 RUN curl -sSL -o "/tmp/${FILENAME_DOCKER_CLI}" "${URL_DOCKER_CLI}" \
     && curl -sSL -o "/tmp/${FILENAME_DOCKER_BUILDX_PLUGIN}" "${URL_DOCKER_BUILDX_PLUGIN}" \
     && curl -sSL -o "/tmp/${FILENAME_DOCKER_COMPOSE_PLUGIN}" "${URL_DOCKER_COMPOSE_PLUGIN}" \
-    && curl -sSL -o "/tmp/${FILENAME_DOCKER_SCOUT_PLUGIN}" "${URL_DOCKER_SCOUT_PLUGIN}" \
     && dpkg -i "/tmp/${FILENAME_DOCKER_CLI}" \
     && dpkg -i "/tmp/${FILENAME_DOCKER_BUILDX_PLUGIN}" \
     && dpkg -i "/tmp/${FILENAME_DOCKER_COMPOSE_PLUGIN}" \
-    && tar xvf "/tmp/${FILENAME_DOCKER_SCOUT_PLUGIN}" -C /usr/libexec/docker/cli-plugins/ docker-scout \
     && groupadd docker \
-    && rm -f "/tmp/"*"${FILENAME_DOCKER_SUFFIX}" \
-    && rm -f "/tmp/${FILENAME_DOCKER_SCOUT_PLUGIN}"
+    && rm -f "/tmp/"*"${FILENAME_DOCKER_SUFFIX}"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL HADOLINT
@@ -285,7 +285,46 @@ ENV HISTFILE="${HOME}/.history/.bash_history"
 
 RUN mkdir -p "${HOME}/.config" \
     && mkdir "${HOME}/.history" \
-    && touch "${HOME}/.history/.bash_history"
+    && touch "${HOME}/.history/.bash_history" \
+    && mkdir -p "${HOME}/.local/bin"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL GOENV
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV GOENV_ROOT="${HOME}/.goenv"
+ENV PATH="${GOENV_ROOT}/bin:${PATH}"
+
+#
+# INSTALL
+#
+
+RUN git clone https://github.com/go-nv/goenv.git "${HOME}/.goenv" \
+    && echo "eval \"\$(goenv init -)\"" >> "${HOME}/.bashrc" \
+    && echo "export PATH=\"\$GOPATH/bin:\$GOROOT/bin:\$PATH\"" >> "${HOME}/.bashrc"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL PYENV
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV PYENV_ROOT="${HOME}/.pyenv"
+ENV PATH="${PYENV_ROOT}/bin:$PATH"
+
+#
+# INSTALL
+#
+
+RUN curl -fsSL https://pyenv.run | bash \
+    && echo "eval \"\$(pyenv init --path)\"" >> "${HOME}/.bashrc" \
+    && echo "eval \"\$(pyenv virtualenv-init -)\"" >> "${HOME}/.bashrc"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TOOLS
@@ -295,7 +334,7 @@ RUN mkdir -p "${HOME}/.config" \
 # ENV
 #
 
-ENV VERSION_CHECKOV="2.4.18"
+ENV VERSION_CHECKOV="3.1.67"
 
 #
 # PYTHON
