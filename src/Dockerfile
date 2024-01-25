@@ -346,7 +346,7 @@ RUN curl -fsSL https://pyenv.run | bash \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.1.67"
+ENV VERSION_CHECKOV="3.1.70"
 ENV VERSION_POETRY="1.7.1"
 
 #
