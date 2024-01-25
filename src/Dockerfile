@@ -347,12 +347,14 @@ RUN curl -fsSL https://pyenv.run | bash \
 #
 
 ENV VERSION_CHECKOV="3.1.67"
+ENV VERSION_POETRY="1.7.1"
 
 #
 # PYTHON
 #
 
-RUN pipx install "checkov==${VERSION_CHECKOV}"
+RUN pipx install "checkov==${VERSION_CHECKOV}" \
+    && pipx install "poetry==${VERSION_POETRY}"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE DIRENV
