@@ -139,6 +139,11 @@
     [ "$status" -eq 0 ]
 }
 
+@test "nvm is installed" {
+    run which nvm
+    [ "$status" -eq 0 ]
+}
+
 @test "pyenv is installed" {
     run which pyenv
     [ "$status" -eq 0 ]
