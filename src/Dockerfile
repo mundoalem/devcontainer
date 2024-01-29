@@ -184,7 +184,7 @@ RUN locale-gen "${DEFAULT_LANG}" \
 
 ENV VERSION_DOCKER_CLI="25.0.0-1"
 ENV VERSION_DOCKER_BUILDX_PLUGIN="0.12.1-1"
-ENV VERSION_DOCKER_COMPOSE_PLUGIN="2.24.1-1"
+ENV VERSION_DOCKER_COMPOSE_PLUGIN="2.24.2-1"
 ENV FILENAME_DOCKER_SUFFIX="ubuntu.${VERSION_UBUNTU}~${VERSION_UBUNTU_NAME}_${TARGETARCH}.deb"
 ENV FILENAME_DOCKER_CLI="docker-ce-cli_${VERSION_DOCKER_CLI}~${FILENAME_DOCKER_SUFFIX}"
 ENV FILENAME_DOCKER_BUILDX_PLUGIN="docker-buildx-plugin_${VERSION_DOCKER_BUILDX_PLUGIN}~${FILENAME_DOCKER_SUFFIX}"
@@ -320,6 +320,23 @@ RUN git clone https://github.com/go-nv/goenv.git "${HOME}/.goenv" \
     && echo "export PATH=\"\$GOPATH/bin:\$GOROOT/bin:\$PATH\"" >> "${HOME}/.bashrc"
 
 # ----------------------------------------------------------------------------------------------------------------------
+# INSTALL NVM
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_NVM="0.39.7"
+ENV URL_NVM="https://raw.githubusercontent.com/nvm-sh/nvm/v${VERSION_NVM}/install.sh"
+
+#
+# INSTALL
+#
+
+RUN curl -o- "${URL_NVM}" | bash
+
+# ----------------------------------------------------------------------------------------------------------------------
 # INSTALL PYENV
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -346,7 +363,7 @@ RUN curl -fsSL https://pyenv.run | bash \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.1.70"
+ENV VERSION_CHECKOV="3.2.1"
 ENV VERSION_POETRY="1.7.1"
 
 #
