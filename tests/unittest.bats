@@ -140,7 +140,7 @@
 }
 
 @test "nvm is installed" {
-    run which nvm
+    run ls ~/.nvm/nvm.sh
     [ "$status" -eq 0 ]
 }
 
