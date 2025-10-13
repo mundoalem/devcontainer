@@ -33,7 +33,7 @@
 # BASE IMAGE
 # ----------------------------------------------------------------------------------------------------------------------
 
-FROM ubuntu:23.04
+FROM ubuntu:24.04
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ARGUMENTS
@@ -64,7 +64,7 @@ ARG PROJECT_VERSION
 
 ARG DEFAULT_LANG="C.UTF-8"
 ARG DEFAULT_USER_PRIMARY_GROUP="developers"
-ARG DEFAULT_USER_SECONDARY_GROUPS="sudo,docker"
+ARG DEFAULT_USER_SECONDARY_GROUPS="sudo"
 ARG DEFAULT_USER_SHELL="/bin/bash"
 ARG DEFAULT_USER="dev"
 
@@ -76,8 +76,8 @@ ARG DEFAULT_USER="dev"
 # OS
 #
 
-ENV VERSION_UBUNTU="23.04"
-ENV VERSION_UBUNTU_NAME="lunar"
+ENV VERSION_UBUNTU="24.04"
+ENV VERSION_UBUNTU_NAME="noble"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # LABELS
@@ -92,7 +92,7 @@ ENV VERSION_UBUNTU_NAME="lunar"
 LABEL org.opencontainers.artifact.created="${PROJECT_BUILD_DATE}"
 LABEL org.opencontainers.artifact.description="Container image to be used as a remote development environment in Visual Studio Code"
 LABEL org.opencontainers.image.authors="Egon Braun <egon@mundoalem.io>"
-LABEL org.opencontainers.image.base.digest="4783be26912a96818aa1c9468ea8acb5eff2608697f62deff67048595a613145"
+LABEL org.opencontainers.image.base.digest="985be7c735afdf6f18aaa122c23f87d989c30bba4e9aa24c8278912aac339a8d"
 LABEL org.opencontainers.image.base.name="docker.io/library/ubuntu:${VERSION_UBUNTU}"
 LABEL org.opencontainers.image.created="${PROJECT_BUILD_DATE}"
 LABEL org.opencontainers.image.description="Container image to be used as a remote development environment in Visual Studio Code"
@@ -111,6 +111,8 @@ LABEL org.opencontainers.image.version="${PROJECT_VERSION}"
 
 SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 
+WORKDIR /
+
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL SYSTEM PACKAGES
 # ----------------------------------------------------------------------------------------------------------------------
@@ -118,13 +120,11 @@ SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 RUN export DEBIAN_FRONTEND="noninteractive" \
     && apt-get update \
     && apt-get -y install --no-install-recommends \
-    binutils-aarch64-linux-gnu \
-    binutils-aarch64-linux-gnu-dbg \
     build-essential \
     ca-certificates \
     curl \
     direnv \
-    gcc-aarch64-linux-gnu \
+    gdb \
     git \
     git-extras \
     gnupg2 \
@@ -151,8 +151,10 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     ssh \
     sudo \
     tk-dev \
+    tzdata \
     unzip \
     vim \
+    wget \
     xz-utils \
     zlib1g-dev \
     && apt-get autoremove -y \
@@ -175,39 +177,6 @@ RUN locale-gen "${DEFAULT_LANG}" \
 #
 
 # ----------------------------------------------------------------------------------------------------------------------
-# INSTALL DOCKER
-# ----------------------------------------------------------------------------------------------------------------------
-
-#
-# ENV
-#
-
-ENV VERSION_DOCKER_CLI="25.0.0-1"
-ENV VERSION_DOCKER_BUILDX_PLUGIN="0.12.1-1"
-ENV VERSION_DOCKER_COMPOSE_PLUGIN="2.24.2-1"
-ENV FILENAME_DOCKER_SUFFIX="ubuntu.${VERSION_UBUNTU}~${VERSION_UBUNTU_NAME}_${TARGETARCH}.deb"
-ENV FILENAME_DOCKER_CLI="docker-ce-cli_${VERSION_DOCKER_CLI}~${FILENAME_DOCKER_SUFFIX}"
-ENV FILENAME_DOCKER_BUILDX_PLUGIN="docker-buildx-plugin_${VERSION_DOCKER_BUILDX_PLUGIN}~${FILENAME_DOCKER_SUFFIX}"
-ENV FILENAME_DOCKER_COMPOSE_PLUGIN="docker-compose-plugin_${VERSION_DOCKER_COMPOSE_PLUGIN}~${FILENAME_DOCKER_SUFFIX}"
-ENV URL_DOCKER_BASE="https://download.docker.com/linux/ubuntu/dists/${VERSION_UBUNTU_NAME}/pool/stable/${TARGETARCH}"
-ENV URL_DOCKER_CLI="${URL_DOCKER_BASE}/${FILENAME_DOCKER_CLI}"
-ENV URL_DOCKER_BUILDX_PLUGIN="${URL_DOCKER_BASE}/${FILENAME_DOCKER_BUILDX_PLUGIN}"
-ENV URL_DOCKER_COMPOSE_PLUGIN="${URL_DOCKER_BASE}/${FILENAME_DOCKER_COMPOSE_PLUGIN}"
-
-#
-# INSTALL
-#
-
-RUN curl -sSL -o "/tmp/${FILENAME_DOCKER_CLI}" "${URL_DOCKER_CLI}" \
-    && curl -sSL -o "/tmp/${FILENAME_DOCKER_BUILDX_PLUGIN}" "${URL_DOCKER_BUILDX_PLUGIN}" \
-    && curl -sSL -o "/tmp/${FILENAME_DOCKER_COMPOSE_PLUGIN}" "${URL_DOCKER_COMPOSE_PLUGIN}" \
-    && dpkg -i "/tmp/${FILENAME_DOCKER_CLI}" \
-    && dpkg -i "/tmp/${FILENAME_DOCKER_BUILDX_PLUGIN}" \
-    && dpkg -i "/tmp/${FILENAME_DOCKER_COMPOSE_PLUGIN}" \
-    && groupadd docker \
-    && rm -f "/tmp/"*"${FILENAME_DOCKER_SUFFIX}"
-
-# ----------------------------------------------------------------------------------------------------------------------
 # INSTALL HADOLINT
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -215,7 +184,7 @@ RUN curl -sSL -o "/tmp/${FILENAME_DOCKER_CLI}" "${URL_DOCKER_CLI}" \
 # ENV
 #
 
-ENV VERSION_HADOLINT="2.12.0"
+ENV VERSION_HADOLINT="2.13.1"
 ENV URL_HADOLINT="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-Linux-${TARGETARCH}"
 
 #
@@ -224,27 +193,6 @@ ENV URL_HADOLINT="https://github.com/hadolint/hadolint/releases/download/v${VERS
 
 RUN curl -sSL -o /usr/local/bin/hadolint "${URL_HADOLINT}" \
     && chmod +x /usr/local/bin/hadolint
-
-# ----------------------------------------------------------------------------------------------------------------------
-# INSTALL GIT DELTA
-# ----------------------------------------------------------------------------------------------------------------------
-
-#
-# ENV
-#
-
-ENV VERSION_GIT_DELTA="0.16.5"
-ENV FILENAME_GIT_DELTA="git-delta_${VERSION_GIT_DELTA}_${TARGETARCH}.deb"
-ENV URL_GIT_DELTA_BASE="https://github.com/dandavison/delta/releases/download/${VERSION_GIT_DELTA}"
-ENV URL_GIT_DELTA="${URL_GIT_DELTA_BASE}/${FILENAME_GIT_DELTA}"
-
-#
-# INSTALL
-#
-
-RUN curl -sSL --http1.1 -o "/tmp/${FILENAME_GIT_DELTA}" "${URL_GIT_DELTA}" \
-    && dpkg -i "/tmp/${FILENAME_GIT_DELTA}" \
-    && rm -f "/tmp/${FILENAME_GIT_DELTA}"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL STARSHIP
@@ -273,11 +221,50 @@ RUN echo \
     # END \
     >"/etc/sudoers.d/${DEFAULT_USER_PRIMARY_GROUP}"
 
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL ALEJANDRA
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_ALEJANDRA=4.0.0
+
+#
+# INSTALL
+#
+
+RUN export cpuarch=$(arch | sed s/arm64/aarch64/) \
+    && curl -fsSL -o /usr/local/bin/alejandra "https://github.com/kamadorueda/alejandra/releases/download/${VERSION_ALEJANDRA}/alejandra-${cpuarch}-unknown-linux-musl" \
+    && chmod +x /usr/local/bin/alejandra
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL TASK
+# ----------------------------------------------------------------------------------------------------------------------
+
+
+#
+# ENV
+#
+
+ENV VERSION_TASK=3.45.4
+
+#
+# INSTALL
+#
+
+RUN curl -fsSL "https://github.com/go-task/task/releases/download/v${VERSION_TASK}/task_linux_${TARGETARCH}.tar.gz" | tar zxf - task \
+    && mv task /usr/local/bin/task \
+    && chmod +x /usr/local/bin/task
+
 # ######################################################################################################################
 # SETUP: CUSTOM (AS DEV USER)
 # ######################################################################################################################
 
 USER "${DEFAULT_USER}"
+
+WORKDIR "/home/${DEFAULT_USER}"
 
 #
 # ENV
@@ -327,7 +314,7 @@ RUN git clone https://github.com/go-nv/goenv.git "${HOME}/.goenv" \
 # ENV
 #
 
-ENV VERSION_NVM="0.39.7"
+ENV VERSION_NVM="0.40.3"
 ENV URL_NVM="https://raw.githubusercontent.com/nvm-sh/nvm/v${VERSION_NVM}/install.sh"
 
 #
@@ -363,15 +350,19 @@ RUN curl -fsSL https://pyenv.run | bash \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.2.1"
-ENV VERSION_POETRY="1.7.1"
+ENV VERSION_CHECKOV="3.2.471"
 
 #
 # PYTHON
 #
 
-RUN pipx install "checkov==${VERSION_CHECKOV}" \
-    && pipx install "poetry==${VERSION_POETRY}"
+RUN pipx install "checkov==${VERSION_CHECKOV}"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL UV
+# ----------------------------------------------------------------------------------------------------------------------
+
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE DIRENV

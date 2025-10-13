@@ -39,7 +39,7 @@ on:
   pull_request:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 # ######################################################################################################################
@@ -59,10 +59,10 @@ env:
 jobs:
   lint:
     name: Lint
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Prepare
         uses: mundoalem/action-prepare@v1
@@ -72,15 +72,15 @@ jobs:
 
       - name: Lint
         run: |
-          make lint
+          task lint
 
   scan:
     name: Scan
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     needs: lint
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Prepare
         uses: mundoalem/action-prepare@v1
@@ -90,11 +90,11 @@ jobs:
 
       - name: Scan
         run: |
-          make scan
+          task scan
 
   pre-ci:
     name: Pre-CI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     needs: scan
     outputs:
       platforms: ${{ steps.platforms.outputs.value }}
@@ -106,14 +106,14 @@ jobs:
 
   ci:
     name: CI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     needs: pre-ci
     strategy:
       matrix:
         platforms: ${{ fromJSON(needs.pre-ci.outputs.platforms) }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Prepare
         uses: mundoalem/action-prepare@v1
@@ -125,22 +125,22 @@ jobs:
         env:
           PROJECT_DOCKER_PLATFORMS: ${{ matrix.platforms }}
         run: |
-          make build
+          task build
 
       - name: Test
         env:
           PROJECT_DOCKER_PLATFORMS: ${{ matrix.platforms }}
         run: |
-          make test
+          task test
 
   cd:
     name: CD
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     needs: ci
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Prepare
         uses: mundoalem/action-prepare@v1
@@ -156,4 +156,4 @@ jobs:
 
       - name: Release
         run: |
-          make release
+          task release
