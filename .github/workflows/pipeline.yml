@@ -92,7 +92,7 @@ jobs:
         run: |
           task scan
 
-  ci:
+  ci-arm:
     name: CI
     runs-on: ubuntu-24.04-arm
     needs: scan
@@ -112,17 +112,52 @@ jobs:
           direnv export gha > "$GITHUB_ENV"
 
       - name: Build
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/arm64
         run: |
           task build
 
       - name: Test
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/arm64
+        run: |
+          task test
+
+  ci-amd:
+    name: CI
+    runs-on: ubuntu-24.04
+    needs: scan
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Prepare
+        uses: mundoalem/action-prepare@v1.3.1
+        with:
+          type: container
+          job: ci
+
+      - name: Load Environment Variables
+        run: |
+          direnv allow .
+          direnv export gha > "$GITHUB_ENV"
+
+      - name: Build
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/amd64
+        run: |
+          task build
+
+      - name: Test
+        env:
+          PROJECT_DOCKER_PLATFORMS: linux/amd64
         run: |
           task test
 
   cd:
     name: CD
     runs-on: ubuntu-24.04-arm
-    needs: ci
+    needs: [ci-amd, ci-arm]
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
     steps:
       - name: Checkout
