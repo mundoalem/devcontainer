@@ -43,16 +43,6 @@ on:
   workflow_dispatch:
 
 # ######################################################################################################################
-# ENVIRONMENT VARIABLES
-# ######################################################################################################################
-
-env:
-  DOCKER_BUILDKIT: 1
-  PROJECT_DOCKER_ORG: ${{ vars.PROJECT_DOCKER_ORG }}
-  PROJECT_DOCKER_PLATFORMS: ${{ vars.PROJECT_DOCKER_PLATFORMS }}
-  PROJECT_NAME: ${{ vars.PROJECT_NAME }}
-
-# ######################################################################################################################
 # JOBS
 # ######################################################################################################################
 
@@ -65,10 +55,15 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Prepare
-        uses: mundoalem/action-prepare@v1
+        uses: mundoalem/action-prepare@v1.3.1
         with:
           type: container
           job: lint
+
+      - name: Load Environment Variables
+        run: |
+          direnv allow .
+          direnv export gha > "$GITHUB_ENV"
 
       - name: Lint
         run: |
@@ -83,53 +78,44 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Prepare
-        uses: mundoalem/action-prepare@v1
+        uses: mundoalem/action-prepare@v1.3.1
         with:
           type: container
           job: scan
+
+      - name: Load Environment Variables
+        run: |
+          direnv allow .
+          direnv export gha > "$GITHUB_ENV"
 
       - name: Scan
         run: |
           task scan
 
-  pre-ci:
-    name: Pre-CI
-    runs-on: ubuntu-24.04-arm
-    needs: scan
-    outputs:
-      platforms: ${{ steps.platforms.outputs.value }}
-    steps:
-      - name: Get Platforms as JSON
-        id: platforms
-        run: |
-          echo "value=[\"$(echo $PROJECT_DOCKER_PLATFORMS | sed 's/,/\",\"/g')\"]" >> $GITHUB_OUTPUT
-
   ci:
     name: CI
     runs-on: ubuntu-24.04-arm
-    needs: pre-ci
-    strategy:
-      matrix:
-        platforms: ${{ fromJSON(needs.pre-ci.outputs.platforms) }}
+    needs: scan
     steps:
       - name: Checkout
         uses: actions/checkout@v5
 
       - name: Prepare
-        uses: mundoalem/action-prepare@v1
+        uses: mundoalem/action-prepare@v1.3.1
         with:
           type: container
           job: ci
 
+      - name: Load Environment Variables
+        run: |
+          direnv allow .
+          direnv export gha > "$GITHUB_ENV"
+
       - name: Build
-        env:
-          PROJECT_DOCKER_PLATFORMS: ${{ matrix.platforms }}
         run: |
           task build
 
       - name: Test
-        env:
-          PROJECT_DOCKER_PLATFORMS: ${{ matrix.platforms }}
         run: |
           task test
 
@@ -143,7 +129,7 @@ jobs:
         uses: actions/checkout@v5
 
       - name: Prepare
-        uses: mundoalem/action-prepare@v1
+        uses: mundoalem/action-prepare@v1.3.1
         with:
           type: container
           job: cd
@@ -153,6 +139,11 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USER }}
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
+
+      - name: Load Environment Variables
+        run: |
+          direnv allow .
+          direnv export gha > "$GITHUB_ENV"
 
       - name: Release
         run: |
