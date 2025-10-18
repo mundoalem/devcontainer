@@ -13,18 +13,12 @@
       "extensions": [
         "eamodio.gitlens",
         "EditorConfig.EditorConfig",
+        "esbenp.prettier-vscode",
         "jetmartin.bats",
-        "ms-azuretools.vscode-docker",
-        "MS-vsliveshare.vsliveshare",
-        "VisualStudioExptTeam.intellicode-api-usage-examples"
+        "ms-azuretools.vscode-docker"
       ],
       "settings": {
         "editor.defaultFormatter": "ms-azuretools.vscode-docker",
-        "editor.formatOnSave": true,
-        "editor.rulers": [
-          80,
-          120
-        ],
         "git.enableCommitSigning": true,
         "terminal.integrated.defaultProfile.linux": "bash",
         "terminal.integrated.profiles.linux": {

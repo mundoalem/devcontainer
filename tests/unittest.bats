@@ -24,20 +24,6 @@
 # ######################################################################################################################
 
 # ----------------------------------------------------------------------------------------------------------------------
-# DOCKER
-# ----------------------------------------------------------------------------------------------------------------------
-
-@test "docker compose plugin is available" {
-    run docker compose version
-    [ "$status" -eq 0 ]
-}
-
-@test "docker buildx plugin is available" {
-    run docker buildx version
-    [ "$status" -eq 0 ]
-}
-
-# ----------------------------------------------------------------------------------------------------------------------
 # USER
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -56,11 +42,6 @@
     [ "$status" -eq 0 ]
 }
 
-@test "docker is a secondary group of dev user" {
-    run bash -c "id dev | grep -E 'groups=.*[0-9]+\(docker\)'"
-    [ "$status" -eq 0 ]
-}
-
 # ----------------------------------------------------------------------------------------------------------------------
 # SYSTEM CONFIGURATION
 # ----------------------------------------------------------------------------------------------------------------------
@@ -74,18 +55,8 @@
 # PACKAGES
 # ----------------------------------------------------------------------------------------------------------------------
 
-@test "aarch64-linux-gnu-as is installed" {
-    run which aarch64-linux-gnu-as
-    [ "$status" -eq 0 ]
-}
-
-@test "aarch64-linux-gnu-ld is installed" {
-    run which aarch64-linux-gnu-ld
-    [ "$status" -eq 0 ]
-}
-
-@test "aarch64-linux-gnu-objdump is installed" {
-    run which aarch64-linux-gnu-objdump
+@test "alejandra is installed" {
+    run which alejandra
     [ "$status" -eq 0 ]
 }
 
@@ -96,11 +67,6 @@
 
 @test "curl is installed" {
     run which curl
-    [ "$status" -eq 0 ]
-}
-
-@test "delta is installed" {
-    run which delta
     [ "$status" -eq 0 ]
 }
 
@@ -154,7 +120,22 @@
     [ "$status" -eq 0 ]
 }
 
+@test "task is installed" {
+    run which task
+    [ "$status" -eq 0 ]
+}
+
 @test "unzip is installed" {
     run which unzip
+    [ "$status" -eq 0 ]
+}
+
+@test "uv is installed" {
+    run which uv
+    [ "$status" -eq 0 ]
+}
+
+@test "wget is installed" {
+    run which wget
     [ "$status" -eq 0 ]
 }

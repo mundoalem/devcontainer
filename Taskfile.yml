@@ -1,0 +1,141 @@
+# ######################################################################################################################
+# LICENSE
+# ######################################################################################################################
+
+#
+# This file is part of devcontainer.
+#
+# The devcontainer is free software: you can redistribute it and/or modify it under the terms of the GNU Affero
+# General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your
+# option) any later version.
+#
+# The devcontainer is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the
+# implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along with devcontainer. If not, see
+# <https://www.gnu.org/licenses/>.
+#
+
+version: "3"
+
+# ######################################################################################################################
+# VARIABLES
+# ######################################################################################################################
+
+vars:
+  POLICIES_DIR: "policies"
+  SOURCE_DIR: "src"
+
+# ######################################################################################################################
+# TASKS
+# ######################################################################################################################
+
+tasks:
+  build:
+    requires:
+      vars:
+        - PROJECT_BUILD_DATE
+        - PROJECT_COMMIT
+        - PROJECT_NAME
+        - PROJECT_VERSION
+        - PROJECT_DOCKER_PLATFORMS
+        - DEFAULT_LANG
+        - DEFAULT_USER_PRIMARY_GROUP
+        - DEFAULT_USER_SECONDARY_GROUPS
+        - DEFAULT_USER_SHELL
+        - DEFAULT_USER
+    cmds:
+      - for: { var: PROJECT_DOCKER_PLATFORMS, split: "," }
+        cmd: |
+          arch="$(echo {{.ITEM}} | cut -d/ -f2)"
+          docker build \
+            --build-arg PROJECT_BUILD_DATE="{{.PROJECT_BUILD_DATE}}" \
+            --build-arg PROJECT_COMMIT="{{.PROJECT_COMMIT}}" \
+            --build-arg PROJECT_VERSION="{{.PROJECT_VERSION}}" \
+            --build-arg DEFAULT_LANG="{{.DEFAULT_LANG}}" \
+            --build-arg DEFAULT_USER_PRIMARY_GROUP="{{.DEFAULT_USER_PRIMARY_GROUP}}" \
+            --build-arg DEFAULT_USER_SECONDARY_GROUPS="{{.DEFAULT_USER_SECONDARY_GROUPS}}" \
+            --build-arg DEFAULT_USER_SHELL="{{.DEFAULT_USER_SHELL}}" \
+            --build-arg DEFAULT_USER="{{.DEFAULT_USER}}" \
+            --file "{{.SOURCE_DIR}}/Dockerfile" \
+            --platform "{{.ITEM}}" \
+            --tag "{{.PROJECT_NAME}}:{{.PROJECT_VERSION}}-$arch" \
+            .
+
+  clean:
+    requires:
+      vars:
+        - PROJECT_NAME
+    cmds:
+      - docker images -q "{{.PROJECT_NAME}}" | sort | uniq | xargs docker rmi --force
+      - docker images -q "{{.PROJECT_NAME}}-test" | sort | uniq | xargs docker rmi --force
+
+  lint:
+    cmds:
+      - hadolint "{{.SOURCE_DIR}}/Dockerfile"
+      - hadolint "{{.SOURCE_DIR}}/Dockerfile.test"
+
+  release:
+    requires:
+      vars:
+        - PROJECT_BUILD_DATE
+        - PROJECT_COMMIT
+        - PROJECT_DOCKER_ORG
+        - PROJECT_DOCKER_REPOSITORY
+        - PROJECT_NAME
+        - PROJECT_VERSION
+        - PROJECT_DOCKER_PLATFORMS
+        - DEFAULT_LANG
+        - DEFAULT_USER_PRIMARY_GROUP
+        - DEFAULT_USER_SECONDARY_GROUPS
+        - DEFAULT_USER_SHELL
+        - DEFAULT_USER
+    cmds:
+      - |
+        docker buildx build \
+          --build-arg PROJECT_BUILD_DATE="{{.PROJECT_BUILD_DATE}}" \
+          --build-arg PROJECT_COMMIT="{{.PROJECT_COMMIT}}" \
+          --build-arg PROJECT_VERSION="{{.PROJECT_VERSION}}" \
+          --build-arg DEFAULT_LANG="{{.DEFAULT_LANG}}" \
+          --build-arg DEFAULT_USER_PRIMARY_GROUP="{{.DEFAULT_USER_PRIMARY_GROUP}}" \
+          --build-arg DEFAULT_USER_SECONDARY_GROUPS="{{.DEFAULT_USER_SECONDARY_GROUPS}}" \
+          --build-arg DEFAULT_USER_SHELL="{{.DEFAULT_USER_SHELL}}" \
+          --build-arg DEFAULT_USER="{{.DEFAULT_USER}}" \
+          --file "{{.SOURCE_DIR}}/Dockerfile" \
+          --platform "{{.PROJECT_DOCKER_PLATFORMS}}" \
+          --tag "{{.PROJECT_DOCKER_ORG}}/{{.PROJECT_DOCKER_REPOSITORY}}:{{.PROJECT_VERSION}}" \
+          --tag "{{.PROJECT_DOCKER_ORG}}/{{.PROJECT_DOCKER_REPOSITORY}}:latest" \
+          --push \
+          .
+
+  scan:
+    cmds:
+      - |
+        checkov \
+          --file "{{.SOURCE_DIR}}/Dockerfile" \
+          --external-checks-dir "{{.POLICIES_DIR}}" \
+          --framework dockerfile \
+          --output cli
+
+  test:
+    requires:
+      vars:
+        - PROJECT_NAME
+        - PROJECT_VERSION
+        - PROJECT_DOCKER_PLATFORMS
+    cmds:
+      - for: { var: PROJECT_DOCKER_PLATFORMS, split: "," }
+        cmd: |
+          arch="$(echo {{.ITEM}} | cut -d/ -f2)"
+          docker build \
+            --build-arg PROJECT_NAME="{{.PROJECT_NAME}}" \
+            --build-arg PROJECT_VERSION="{{.PROJECT_VERSION}}-$arch" \
+            --file "{{.SOURCE_DIR}}/Dockerfile.test" \
+            --platform "{{.ITEM}}" \
+            --tag "{{.PROJECT_NAME}}-test:$arch" \
+            . \
+          && docker run \
+            --platform "{{.ITEM}}" \
+            --rm \
+            "{{.PROJECT_NAME}}-test:$arch"
