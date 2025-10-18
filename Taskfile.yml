@@ -60,7 +60,7 @@ tasks:
             --build-arg DEFAULT_USER="{{.DEFAULT_USER}}" \
             --file "{{.SOURCE_DIR}}/Dockerfile" \
             --platform "{{.ITEM}}" \
-            {{.DOCKER_EXTRA_ARGS}} \
+            {{.PROJECT_DOCKER_EXTRA_ARGS}} \
             --tag "{{.PROJECT_NAME}}:{{.PROJECT_VERSION}}-$arch" \
             .
 
@@ -108,7 +108,7 @@ tasks:
           --tag "{{.PROJECT_DOCKER_ORG}}/{{.PROJECT_DOCKER_REPOSITORY}}:{{.PROJECT_VERSION}}" \
           --tag "{{.PROJECT_DOCKER_ORG}}/{{.PROJECT_DOCKER_REPOSITORY}}:latest" \
           --push \
-          {{.DOCKER_EXTRA_ARGS}} \
+          {{.PROJECT_DOCKER_EXTRA_ARGS}} \
           .
 
   scan:
@@ -136,7 +136,7 @@ tasks:
             --file "{{.SOURCE_DIR}}/Dockerfile.test" \
             --platform "{{.ITEM}}" \
             --tag "{{.PROJECT_NAME}}-test:$arch" \
-            {{.DOCKER_EXTRA_ARGS}} \
+            {{.PROJECT_DOCKER_EXTRA_ARGS}} \
             . \
           && docker run \
             --platform "{{.ITEM}}" \
