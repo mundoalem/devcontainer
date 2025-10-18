@@ -93,7 +93,7 @@ jobs:
           task scan
 
   ci-arm:
-    name: CI
+    name: CI (arm64)
     runs-on: ubuntu-24.04-arm
     needs: scan
     steps:
@@ -124,7 +124,7 @@ jobs:
           task test
 
   ci-amd:
-    name: CI
+    name: CI (amd64)
     runs-on: ubuntu-24.04
     needs: scan
     steps:
