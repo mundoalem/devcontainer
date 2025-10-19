@@ -184,7 +184,7 @@ RUN locale-gen "${DEFAULT_LANG}" \
 # ENV
 #
 
-ENV VERSION_HADOLINT="2.13.1"
+ENV VERSION_HADOLINT="2.14.0"
 ENV URL_HADOLINT="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-Linux-${TARGETARCH}"
 
 #
@@ -199,6 +199,25 @@ RUN curl -sSL -o /usr/local/bin/hadolint "${URL_HADOLINT}" \
 # ----------------------------------------------------------------------------------------------------------------------
 
 RUN curl -fsSL https://starship.rs/install.sh | sh -s -- --yes
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL TENV
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_TENV="4.7.21"
+ENV URL_TENV="https://github.com/tofuutils/tenv/releases/latest/download/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
+
+#
+# INSTALL
+#
+
+RUN curl -fsSL -o /tmp/tenv.deb "${URL_TENV}" \
+    && dpkg -i /tmp/tenv.deb \
+    && rm -f /tmp/tenv.deb
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CREATE DEV USER
@@ -242,7 +261,6 @@ RUN export cpuarch=$(arch | sed s/arm64/aarch64/) \
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TASK
 # ----------------------------------------------------------------------------------------------------------------------
-
 
 #
 # ENV
@@ -350,7 +368,7 @@ RUN curl -fsSL https://pyenv.run | bash \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.2.471"
+ENV VERSION_CHECKOV="3.2.484"
 
 #
 # PYTHON

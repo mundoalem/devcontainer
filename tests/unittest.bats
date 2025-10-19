@@ -125,6 +125,11 @@
     [ "$status" -eq 0 ]
 }
 
+@test "tenv is installed" {
+    run which tenv
+    [ "$status" -eq 0 ]
+}
+
 @test "unzip is installed" {
     run which unzip
     [ "$status" -eq 0 ]
