@@ -184,7 +184,7 @@ RUN locale-gen "${DEFAULT_LANG}" \
 # ENV
 #
 
-ENV VERSION_HADOLINT="2.13.1"
+ENV VERSION_HADOLINT="2.14.0"
 ENV URL_HADOLINT="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-Linux-${TARGETARCH}"
 
 #
@@ -350,7 +350,7 @@ RUN curl -fsSL https://pyenv.run | bash \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.2.471"
+ENV VERSION_CHECKOV="3.2.484"
 
 #
 # PYTHON
