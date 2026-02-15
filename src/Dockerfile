@@ -242,6 +242,27 @@ RUN curl -sSLo ./terraform-docs.tar.gz "${URL_TERRAFORM_DOCS}" \
 
 
 # ----------------------------------------------------------------------------------------------------------------------
+# INSTALL TFLINT
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_TFLINT="0.61.0"
+ENV URL_TFLINT="https://github.com/terraform-linters/tflint/releases/download/v${VERSION_TFLINT}/tflint_linux_${TARGETARCH}.zip"
+
+#
+# INSTALL
+#
+
+RUN curl -sSLo ./tflint.zip "${URL_TFLINT}" \
+    && unzip ./tflint.zip \
+    && chmod +x tflint \
+    && mv tflint /usr/local/bin \
+    && rm -f ./tflint.zip
+
+# ----------------------------------------------------------------------------------------------------------------------
 # CREATE DEV USER
 # ----------------------------------------------------------------------------------------------------------------------
 
