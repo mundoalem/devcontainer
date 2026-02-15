@@ -208,8 +208,8 @@ RUN curl -fsSL https://starship.rs/install.sh | sh -s -- --yes
 # ENV
 #
 
-ENV VERSION_TENV="4.7.21"
-ENV URL_TENV="https://github.com/tofuutils/tenv/releases/latest/download/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
+ENV VERSION_TENV="4.9.3"
+ENV URL_TENV="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
 
 #
 # INSTALL
