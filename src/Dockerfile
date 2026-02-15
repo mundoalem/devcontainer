@@ -208,8 +208,8 @@ RUN curl -fsSL https://starship.rs/install.sh | sh -s -- --yes
 # ENV
 #
 
-ENV VERSION_TENV="4.7.21"
-ENV URL_TENV="https://github.com/tofuutils/tenv/releases/latest/download/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
+ENV VERSION_TENV="4.9.3"
+ENV URL_TENV="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
 
 #
 # INSTALL
@@ -218,6 +218,49 @@ ENV URL_TENV="https://github.com/tofuutils/tenv/releases/latest/download/tenv_v$
 RUN curl -fsSL -o /tmp/tenv.deb "${URL_TENV}" \
     && dpkg -i /tmp/tenv.deb \
     && rm -f /tmp/tenv.deb
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL TERRAFORM-DOCS
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_TERRAFORM_DOCS="0.21.0"
+ENV URL_TERRAFORM_DOCS="https://terraform-docs.io/dl/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz"
+
+#
+# INSTALL
+#
+
+RUN curl -sSLo ./terraform-docs.tar.gz "${URL_TERRAFORM_DOCS}" \
+    && tar -xf terraform-docs.tar.gz \
+    && chmod +x terraform-docs \
+    && mv terraform-docs /usr/local/bin/ \
+    && rm -f ./terraform-docs.tar.gz
+
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL TFLINT
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_TFLINT="0.61.0"
+ENV URL_TFLINT="https://github.com/terraform-linters/tflint/releases/download/v${VERSION_TFLINT}/tflint_linux_${TARGETARCH}.zip"
+
+#
+# INSTALL
+#
+
+RUN curl -sSLo ./tflint.zip "${URL_TFLINT}" \
+    && unzip ./tflint.zip \
+    && chmod +x tflint \
+    && mv tflint /usr/local/bin \
+    && rm -f ./tflint.zip
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CREATE DEV USER
@@ -266,7 +309,7 @@ RUN export cpuarch=$(arch | sed s/arm64/aarch64/) \
 # ENV
 #
 
-ENV VERSION_TASK=3.45.4
+ENV VERSION_TASK=3.48.0
 
 #
 # INSTALL
@@ -332,7 +375,7 @@ RUN git clone https://github.com/go-nv/goenv.git "${HOME}/.goenv" \
 # ENV
 #
 
-ENV VERSION_NVM="0.40.3"
+ENV VERSION_NVM="0.40.4"
 ENV URL_NVM="https://raw.githubusercontent.com/nvm-sh/nvm/v${VERSION_NVM}/install.sh"
 
 #
@@ -368,7 +411,7 @@ RUN curl -fsSL https://pyenv.run | bash \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.2.484"
+ENV VERSION_CHECKOV="3.2.501"
 
 #
 # PYTHON

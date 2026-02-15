@@ -130,6 +130,16 @@
     [ "$status" -eq 0 ]
 }
 
+@test "terraform-docs is installed" {
+    run which terraform-docs
+    [ "$status" -eq 0 ]
+}
+
+@test "tflint is installed" {
+    run which tflint
+    [ "$status" -eq 0 ]
+}
+
 @test "unzip is installed" {
     run which unzip
     [ "$status" -eq 0 ]
