@@ -220,6 +220,28 @@ RUN curl -fsSL -o /tmp/tenv.deb "${URL_TENV}" \
     && rm -f /tmp/tenv.deb
 
 # ----------------------------------------------------------------------------------------------------------------------
+# INSTALL TERRAFORM-DOCS
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_TERRAFORM_DOCS="0.21.0"
+ENV URL_TERRAFORM_DOCS="https://terraform-docs.io/dl/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz"
+
+#
+# INSTALL
+#
+
+RUN curl -sSLo ./terraform-docs.tar.gz "${URL_TERRAFORM_DOCS}" \
+    && tar -xf terraform-docs.tar.gz \
+    && chmod +x terraform-docs \
+    && mv terraform-docs /usr/local/bin/ \
+    && rm -f ./terraform-docs.tar.gz
+
+
+# ----------------------------------------------------------------------------------------------------------------------
 # CREATE DEV USER
 # ----------------------------------------------------------------------------------------------------------------------
 
