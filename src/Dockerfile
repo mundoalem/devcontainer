@@ -332,7 +332,7 @@ RUN git clone https://github.com/go-nv/goenv.git "${HOME}/.goenv" \
 # ENV
 #
 
-ENV VERSION_NVM="0.40.3"
+ENV VERSION_NVM="0.40.4"
 ENV URL_NVM="https://raw.githubusercontent.com/nvm-sh/nvm/v${VERSION_NVM}/install.sh"
 
 #
