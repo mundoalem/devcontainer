@@ -266,7 +266,7 @@ RUN export cpuarch=$(arch | sed s/arm64/aarch64/) \
 # ENV
 #
 
-ENV VERSION_TASK=3.45.4
+ENV VERSION_TASK=3.48.0
 
 #
 # INSTALL
