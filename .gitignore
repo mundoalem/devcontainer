@@ -25,4 +25,4 @@ Temporary Items
 #
 
 .tmp/
-.envrc.local
+.env.local

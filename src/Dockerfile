@@ -92,7 +92,6 @@ ENV VERSION_UBUNTU_NAME="noble"
 LABEL org.opencontainers.artifact.created="${PROJECT_BUILD_DATE}"
 LABEL org.opencontainers.artifact.description="Container image to be used as a remote development environment in Visual Studio Code"
 LABEL org.opencontainers.image.authors="Egon Braun <egon@mundoalem.io>"
-LABEL org.opencontainers.image.base.digest="985be7c735afdf6f18aaa122c23f87d989c30bba4e9aa24c8278912aac339a8d"
 LABEL org.opencontainers.image.base.name="docker.io/library/ubuntu:${VERSION_UBUNTU}"
 LABEL org.opencontainers.image.created="${PROJECT_BUILD_DATE}"
 LABEL org.opencontainers.image.description="Container image to be used as a remote development environment in Visual Studio Code"
@@ -195,12 +194,6 @@ RUN curl -sSL -o /usr/local/bin/hadolint "${URL_HADOLINT}" \
     && chmod +x /usr/local/bin/hadolint
 
 # ----------------------------------------------------------------------------------------------------------------------
-# INSTALL STARSHIP
-# ----------------------------------------------------------------------------------------------------------------------
-
-RUN curl -fsSL https://starship.rs/install.sh | sh -s -- --yes
-
-# ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TENV
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -208,7 +201,7 @@ RUN curl -fsSL https://starship.rs/install.sh | sh -s -- --yes
 # ENV
 #
 
-ENV VERSION_TENV="4.9.3"
+ENV VERSION_TENV="4.10.1"
 ENV URL_TENV="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
 
 #
@@ -227,7 +220,7 @@ RUN curl -fsSL -o /tmp/tenv.deb "${URL_TENV}" \
 # ENV
 #
 
-ENV VERSION_TERRAFORM_DOCS="0.21.0"
+ENV VERSION_TERRAFORM_DOCS="0.22.0"
 ENV URL_TERRAFORM_DOCS="https://terraform-docs.io/dl/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz"
 
 #
@@ -309,7 +302,7 @@ RUN export cpuarch=$(arch | sed s/arm64/aarch64/) \
 # ENV
 #
 
-ENV VERSION_TASK=3.48.0
+ENV VERSION_TASK=3.49.1
 
 #
 # INSTALL
@@ -347,6 +340,22 @@ RUN mkdir -p "${HOME}/.config" \
     && mkdir "${HOME}/.history" \
     && touch "${HOME}/.history/.bash_history" \
     && mkdir -p "${HOME}/.local/bin"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL CLAUDE
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_CLAUDE="2.1.104"
+
+#
+# INSTALL
+#
+
+RUN curl -fsSL https://claude.ai/install.sh | bash -s -- "${VERSION_CLAUDE}"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL GOENV
@@ -411,7 +420,7 @@ RUN curl -fsSL https://pyenv.run | bash \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.2.501"
+ENV VERSION_CHECKOV="3.2.519"
 
 #
 # PYTHON
@@ -430,12 +439,6 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 # ----------------------------------------------------------------------------------------------------------------------
 
 RUN echo "eval \"\$(direnv hook bash)\"" >> "${HOME}/.bashrc"
-
-# ----------------------------------------------------------------------------------------------------------------------
-# CONFIGURE SHELL PROMPT
-# ----------------------------------------------------------------------------------------------------------------------
-
-RUN echo "eval \"\$(starship init bash)\"" >> "${HOME}/.bashrc"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE ALIASES
