@@ -201,7 +201,7 @@ RUN curl -sSL -o /usr/local/bin/hadolint "${URL_HADOLINT}" \
 # ENV
 #
 
-ENV VERSION_TENV="4.9.3"
+ENV VERSION_TENV="4.10.1"
 ENV URL_TENV="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
 
 #
