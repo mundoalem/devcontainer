@@ -404,7 +404,7 @@ RUN curl -fsSL https://pyenv.run | bash \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.2.501"
+ENV VERSION_CHECKOV="3.2.519"
 
 #
 # PYTHON
