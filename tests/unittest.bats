@@ -65,6 +65,11 @@
     [ "$status" -eq 0 ]
 }
 
+@test "claude is installed" {
+    run which claude
+    [ "$status" -eq 0 ]
+}
+
 @test "curl is installed" {
     run which curl
     [ "$status" -eq 0 ]
