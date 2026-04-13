@@ -220,7 +220,7 @@ RUN curl -fsSL -o /tmp/tenv.deb "${URL_TENV}" \
 # ENV
 #
 
-ENV VERSION_TERRAFORM_DOCS="0.21.0"
+ENV VERSION_TERRAFORM_DOCS="0.22.0"
 ENV URL_TERRAFORM_DOCS="https://terraform-docs.io/dl/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz"
 
 #
