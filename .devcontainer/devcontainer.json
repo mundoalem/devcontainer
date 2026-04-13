@@ -33,6 +33,8 @@
 
   "mounts": [
     "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock",
-    "type=bind,consistency=cached,source=${localWorkspaceFolder}/.tmp/history,target=/home/dev/.history"
+    "type=bind,consistency=cached,source=${localWorkspaceFolder}/.tmp/history,target=/home/dev/.history",
+    "type=bind,source=${localEnv:HOME}/.claude/,target=/home/dev/.claude/",
+    "type=bind,source=${localEnv:HOME}/.claude.json,target=/home/dev/.claude.json"
   ]
 }
