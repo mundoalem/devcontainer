@@ -184,14 +184,21 @@ RUN locale-gen "${DEFAULT_LANG}" \
 #
 
 ENV VERSION_HADOLINT="2.14.0"
-ENV URL_HADOLINT="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-Linux-${TARGETARCH}"
+ENV URL_HADOLINT="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${TARGETARCH}"
+ENV URL_HADOLINT_SHA256="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${TARGETARCH}.sha256"
 
 #
 # INSTALL
 #
 
-RUN curl -sSL -o /usr/local/bin/hadolint "${URL_HADOLINT}" \
-    && chmod +x /usr/local/bin/hadolint
+RUN curl -sSL -o /tmp/hadolint-linux-${TARGETARCH} "${URL_HADOLINT}" \
+    && curl -sSL -o /tmp/hadolint-linux-${TARGETARCH}.sha256 "${URL_HADOLINT_SHA256}" \
+    && cd /tmp \
+    && sha256sum -c hadolint-linux-${TARGETARCH}.sha256 \
+    && cd - \
+    && mv /tmp/hadolint-linux-${TARGETARCH} /usr/local/bin/hadolint \
+    && chmod +x /usr/local/bin/hadolint \
+    && rm -f /tmp/hadolint-*
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TENV
