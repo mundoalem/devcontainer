@@ -33,6 +33,10 @@
 # BASE IMAGE
 # ----------------------------------------------------------------------------------------------------------------------
 
+# Imports
+FROM ghcr.io/sigstore/cosign/cosign:v3.0.6 as cosign-bin
+
+# Base
 FROM ubuntu:24.04@sha256:84e77dee7d1bc93fb029a45e3c6cb9d8aa4831ccfcc7103d36e876938d28895b
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -161,6 +165,12 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     && rm -r /var/cache/* /var/lib/apt/lists/*
 
 # ----------------------------------------------------------------------------------------------------------------------
+# COPY COSIGN BINARY FROM IMAGE
+# ----------------------------------------------------------------------------------------------------------------------
+
+COPY --from=cosign-bin /ko-app/cosign /usr/local/bin/cosign
+
+# ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE LOCALISATION
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -210,14 +220,36 @@ RUN curl -sSL -o /tmp/hadolint-linux-${TARGETARCH} "${URL_HADOLINT}" \
 
 ENV VERSION_TENV="4.10.1"
 ENV URL_TENV="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
+ENV URL_TENV_PEM="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb.pem"
+ENV URL_TENV_SIG="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb.sig"
+ENV URL_TENV_CHECKSUMS="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_checksums.txt"
+ENV URL_TENV_CHECKSUMS_SIG="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_checksums.txt.sig"
+ENV URL_TENV_CHECKSUMS_PEM="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_checksums.txt.pem"
 
 #
 # INSTALL
 #
 
-RUN curl -fsSL -o /tmp/tenv.deb "${URL_TENV}" \
-    && dpkg -i /tmp/tenv.deb \
-    && rm -f /tmp/tenv.deb
+RUN curl -sOL "${URL_TENV_CHECKSUMS}" \
+    && curl -sOL "${URL_TENV_CHECKSUMS_SIG}" \
+    && curl -sOL "${URL_TENV_CHECKSUMS_PEM}" \
+    && curl -sOL "${URL_TENV}" \
+    && curl -sOL "${URL_TENV_PEM}" \
+    && curl -sOL "${URL_TENV_SIG}" \
+    && cosign verify-blob \
+        --certificate-identity "https://github.com/tofuutils/tenv/.github/workflows/release.yml@refs/tags/v${VERSION_TENV}" \
+        --signature "tenv_v${VERSION_TENV}_checksums.txt.sig" \
+        --certificate "tenv_v${VERSION_TENV}_checksums.txt.pem" \
+        --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+        "tenv_v${VERSION_TENV}_checksums.txt" \
+    && cosign verify-blob \
+        --certificate-identity "https://github.com/tofuutils/tenv/.github/workflows/release.yml@refs/tags/v${VERSION_TENV}" \
+        --signature "tenv_v${VERSION_TENV}_${TARGETARCH}.deb.sig" \
+        --certificate "tenv_v${VERSION_TENV}_${TARGETARCH}.deb.pem" \
+        --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+        "tenv_v${VERSION_TENV}_${TARGETARCH}.deb" \
+    && dpkg -i "tenv_v${VERSION_TENV}_${TARGETARCH}.deb" \
+    && rm -f tenv_*
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TERRAFORM-DOCS
