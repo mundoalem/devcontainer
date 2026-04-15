@@ -160,14 +160,14 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     wget \
     xz-utils \
     zlib1g-dev \
-    && mkdir -p -m 755 /etc/apt/keyrings \
+    && mkdir -p /etc/apt/keyrings \
     && curl -sOL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 	&& mv githubcli-archive-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg \
 	&& chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-	&& mkdir -p -m 755 /etc/apt/sources.list.d \
+	&& mkdir -p /etc/apt/sources.list.d \
 	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
-	&& apt update \
-	&& apt install gh -y \
+	&& apt-get update \
+	&& apt-get -y install gh \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
