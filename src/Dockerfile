@@ -160,6 +160,14 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     wget \
     xz-utils \
     zlib1g-dev \
+    && mkdir -p -m 755 /etc/apt/keyrings \
+    && wget -nv -O githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+	&& mv githubcli-archive-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& mkdir -p -m 755 /etc/apt/sources.list.d \
+	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+	&& sudo apt update \
+	&& sudo apt install gh -y \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
@@ -287,16 +295,20 @@ RUN curl -sLO "${URL_TERRAFORM_DOCS_SHA256}" \
 
 ENV VERSION_TFLINT="0.61.0"
 ENV URL_TFLINT="https://github.com/terraform-linters/tflint/releases/download/v${VERSION_TFLINT}/tflint_linux_${TARGETARCH}.zip"
+ENV URL_TFLINT_CHECKSUMS="https://github.com/terraform-linters/tflint/releases/download/v${VERSION_TFLINT}/checksums.txt"
 
 #
 # INSTALL
 #
 
-RUN curl -sSLo ./tflint.zip "${URL_TFLINT}" \
-    && unzip ./tflint.zip \
+
+RUN curl -sOL "${URL_TFLINT}" \
+    && curl -sOL "${URL_TFLINT_CHECKSUMS}" \
+    && sha256sum -c checksums.txt --ignore-missing \
+    && unzip "./tflint_linux_${TARGETARCH}.zip" \
     && chmod +x tflint \
     && mv tflint /usr/local/bin \
-    && rm -f ./tflint.zip
+    && rm -f ./tflint* checksums.txt
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CREATE DEV USER
