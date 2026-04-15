@@ -207,8 +207,8 @@ RUN case "${TARGETARCH}" in \
     esac \
     && curl -sOL "${URL_HADOLINT}" \
     && curl -sOL "${URL_HADOLINT_SHA256}" \
-    && sha256sum -c "hadolint-linux-${TARGETARCH}.sha256" \
-    && mv "hadolint-linux-${TARGETARCH}" /usr/local/bin/hadolint \
+    && sha256sum -c "hadolint-linux-${arch}.sha256" \
+    && mv "hadolint-linux-${arch}" /usr/local/bin/hadolint \
     && chmod +x /usr/local/bin/hadolint \
     && rm -f /tmp/hadolint-*
 
