@@ -161,7 +161,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     xz-utils \
     zlib1g-dev \
     && mkdir -p -m 755 /etc/apt/keyrings \
-    && wget -nv -O githubcli-archive-keyring.gpg https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+    && curl -sOL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 	&& mv githubcli-archive-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg \
 	&& chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
 	&& mkdir -p -m 755 /etc/apt/sources.list.d \
@@ -208,13 +208,13 @@ ENV VERSION_HADOLINT="2.14.0"
 #
 
 RUN case "${TARGETARCH}" in \
-        amd64) arch="x86_64" ;; \
-        *) arch="${TARGETARCH}" ;; \
+        amd64) cpuarch="x86_64" ;; \
+        *) cpuarch="${TARGETARCH}" ;; \
     esac \
-    && curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${arch}" \
-    && curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${arch}.sha256" \
-    && sha256sum -c "hadolint-linux-${arch}.sha256" \
-    && mv "hadolint-linux-${arch}" /usr/local/bin/hadolint \
+    && curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${cpuarch}" \
+    && curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${cpuarch}.sha256" \
+    && sha256sum -c "hadolint-linux-${cpuarch}.sha256" \
+    && mv "hadolint-linux-${cpuarch}" /usr/local/bin/hadolint \
     && chmod +x /usr/local/bin/hadolint \
     && rm -f /tmp/hadolint-*
 
@@ -345,7 +345,10 @@ ENV VERSION_ALEJANDRA=4.0.0
 # INSTALL
 #
 
-RUN export cpuarch=$(arch | sed s/arm64/aarch64/) \
+RUN case "${TARGETARCH}" in \
+        arm64) cpuarch="aarch64" ;; \
+        *) cpuarch="${TARGETARCH}" ;; \
+    esac \
     && curl -fsSL -o /usr/local/bin/alejandra "https://github.com/kamadorueda/alejandra/releases/download/${VERSION_ALEJANDRA}/alejandra-${cpuarch}-unknown-linux-musl" \
     && chmod +x /usr/local/bin/alejandra
 
