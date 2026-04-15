@@ -248,6 +248,7 @@ RUN curl -sOL "${URL_TENV_CHECKSUMS}" \
         --certificate "tenv_v${VERSION_TENV}_${TARGETARCH}.deb.pem" \
         --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
         "tenv_v${VERSION_TENV}_${TARGETARCH}.deb" \
+    && shasum -a 256 -c "tenv_v${VERSION_TENV}_checksums.txt" --ignore-missing \
     && dpkg -i "tenv_v${VERSION_TENV}_${TARGETARCH}.deb" \
     && rm -f tenv_*
 
