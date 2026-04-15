@@ -201,12 +201,10 @@ ENV URL_HADOLINT_SHA256="https://github.com/hadolint/hadolint/releases/download/
 # INSTALL
 #
 
-RUN curl -sSL -o /tmp/hadolint-linux-${TARGETARCH} "${URL_HADOLINT}" \
-    && curl -sSL -o /tmp/hadolint-linux-${TARGETARCH}.sha256 "${URL_HADOLINT_SHA256}" \
-    && cd /tmp \
-    && sha256sum -c hadolint-linux-${TARGETARCH}.sha256 \
-    && cd - \
-    && mv /tmp/hadolint-linux-${TARGETARCH} /usr/local/bin/hadolint \
+RUN curl -sOL "${URL_HADOLINT}" \
+    && curl -sOL "${URL_HADOLINT_SHA256}" \
+    && sha256sum -c "hadolint-linux-${TARGETARCH}.sha256" \
+    && mv "hadolint-linux-${TARGETARCH}" /usr/local/bin/hadolint \
     && chmod +x /usr/local/bin/hadolint \
     && rm -f /tmp/hadolint-*
 
