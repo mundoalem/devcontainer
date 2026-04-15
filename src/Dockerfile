@@ -34,7 +34,7 @@
 # ----------------------------------------------------------------------------------------------------------------------
 
 # Imports
-FROM ghcr.io/sigstore/cosign/cosign:v3.0.6 as cosign-bin
+FROM ghcr.io/sigstore/cosign/cosign:v3.0.6 AS cosign-bin
 
 # Base
 FROM ubuntu:24.04@sha256:84e77dee7d1bc93fb029a45e3c6cb9d8aa4831ccfcc7103d36e876938d28895b
@@ -248,7 +248,7 @@ RUN curl -sOL "${URL_TENV_CHECKSUMS}" \
         --certificate "tenv_v${VERSION_TENV}_${TARGETARCH}.deb.pem" \
         --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
         "tenv_v${VERSION_TENV}_${TARGETARCH}.deb" \
-    && shasum -a 256 -c "tenv_v${VERSION_TENV}_checksums.txt" --ignore-missing \
+    && sha256sum -c "tenv_v${VERSION_TENV}_checksums.txt" --ignore-missing \
     && dpkg -i "tenv_v${VERSION_TENV}_${TARGETARCH}.deb" \
     && rm -f tenv_*
 
@@ -261,17 +261,20 @@ RUN curl -sOL "${URL_TENV_CHECKSUMS}" \
 #
 
 ENV VERSION_TERRAFORM_DOCS="0.22.0"
-ENV URL_TERRAFORM_DOCS="https://terraform-docs.io/dl/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz"
+ENV URL_TERRAFORM_DOCS="https://github.com/terraform-docs/terraform-docs/releases/download/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz"
+ENV URL_TERRAFORM_DOCS_SHA256="https://github.com/terraform-docs/terraform-docs/releases/download/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}.sha256sum"
 
 #
 # INSTALL
 #
 
-RUN curl -sSLo ./terraform-docs.tar.gz "${URL_TERRAFORM_DOCS}" \
-    && tar -xf terraform-docs.tar.gz \
+RUN curl -sLO "${URL_TERRAFORM_DOCS_SHA256}" \
+    && curl -sLO "${URL_TERRAFORM_DOCS}" \
+    && sha256sum -c "terraform-docs-v${VERSION_TERRAFORM_DOCS}.sha256sum" --ignore-missing \
+    && tar -xf "terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz" \
     && chmod +x terraform-docs \
     && mv terraform-docs /usr/local/bin/ \
-    && rm -f ./terraform-docs.tar.gz
+    && rm -f terraform-docs-*
 
 
 # ----------------------------------------------------------------------------------------------------------------------
