@@ -194,8 +194,6 @@ RUN locale-gen "${DEFAULT_LANG}" \
 #
 
 ENV VERSION_HADOLINT="2.14.0"
-ENV URL_HADOLINT="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${TARGETARCH}"
-ENV URL_HADOLINT_SHA256="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${TARGETARCH}.sha256"
 
 #
 # INSTALL
@@ -205,8 +203,8 @@ RUN case "${TARGETARCH}" in \
         amd64) arch="x86_64" ;; \
         *) arch="${TARGETARCH}" ;; \
     esac \
-    && curl -sOL "${URL_HADOLINT}" \
-    && curl -sOL "${URL_HADOLINT_SHA256}" \
+    && curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${arch}" \
+    && curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${arch}.sha256" \
     && sha256sum -c "hadolint-linux-${arch}.sha256" \
     && mv "hadolint-linux-${arch}" /usr/local/bin/hadolint \
     && chmod +x /usr/local/bin/hadolint \
