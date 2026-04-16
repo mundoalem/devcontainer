@@ -431,7 +431,10 @@ ENV VERSION_CLAUDE="2.1.104"
 # INSTALL
 #
 
-RUN curl -fsSL https://claude.ai/install.sh | bash -s -- "${VERSION_CLAUDE}"
+RUN curl -fsSL -o /tmp/install.sh https://claude.ai/install.sh \
+    && echo "431889ac7d056f636aaf5b71524666d04c89c45560f80329940846479d484778  /tmp/install.sh" | sha256sum -c - \
+    && chmod +x /tmp/install.sh \
+    && /tmp/install.sh "${VERSION_CLAUDE}"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL GOENV
