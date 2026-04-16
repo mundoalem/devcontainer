@@ -349,8 +349,8 @@ RUN case "${TARGETARCH}" in \
         arm64) \
             cpuarch="aarch64"; \
             checksum="a30b0d54ee3f0d6633d0398b50258408d2cc31646a9c8c4ba3ee4ebf2cebd8c8" ;; \
-        x86_64) \
-            cpuarch="${TARGETARCH}"; \
+        amd64) \
+            cpuarch="x86_64"; \
             checksum="a23b9d47cba945805c6169541046de890e94e07a5aa416c86dee15bca2da6216" ;; \
         *) \
             echo "Unsupported arch: ${TARGETARCH}" && exit 1 ;; \
