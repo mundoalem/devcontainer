@@ -346,10 +346,17 @@ ENV VERSION_ALEJANDRA=4.0.0
 #
 
 RUN case "${TARGETARCH}" in \
-        arm64) cpuarch="aarch64" ;; \
-        *) cpuarch="${TARGETARCH}" ;; \
+        arm64) \
+            cpuarch="aarch64"; \
+            checksum="a30b0d54ee3f0d6633d0398b50258408d2cc31646a9c8c4ba3ee4ebf2cebd8c8" ;; \
+        x86_64) \
+            cpuarch="${TARGETARCH}"; \
+            checksum="a23b9d47cba945805c6169541046de890e94e07a5aa416c86dee15bca2da6216" ;; \
+        *) \
+            echo "Unsupported arch: ${TARGETARCH}" && exit 1 ;; \
     esac \
     && curl -fsSL -o /usr/local/bin/alejandra "https://github.com/kamadorueda/alejandra/releases/download/${VERSION_ALEJANDRA}/alejandra-${cpuarch}-unknown-linux-musl" \
+    && echo "${checksum}  /usr/local/bin/alejandra" | sha256sum -c - \
     && chmod +x /usr/local/bin/alejandra
 
 # ----------------------------------------------------------------------------------------------------------------------
