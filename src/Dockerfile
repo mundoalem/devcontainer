@@ -167,7 +167,7 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
 	&& mkdir -p /etc/apt/sources.list.d \
 	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
 	&& apt-get update \
-	&& apt-get -y install gh \
+	&& apt-get -y install --no-install-recommends gh \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
