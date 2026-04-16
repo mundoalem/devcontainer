@@ -360,15 +360,21 @@ RUN case "${TARGETARCH}" in \
 # ENV
 #
 
-ENV VERSION_TASK=3.49.1
+ENV VERSION_TASK=3.50.0
+ENV URL_TASK="https://github.com/go-task/task/releases/download/v${VERSION_TASK}/task_linux_${TARGETARCH}.tar.gz"
+ENV URL_TASK_CHECKSUMS="https://github.com/go-task/task/releases/download/v${VERSION_TASK}/task_checksums.txt"
 
 #
 # INSTALL
 #
 
-RUN curl -fsSL "https://github.com/go-task/task/releases/download/v${VERSION_TASK}/task_linux_${TARGETARCH}.tar.gz" | tar zxf - task \
+RUN curl -sOL "${URL_TASK}" \
+    && curl -sOL "${URL_TASK_CHECKSUMS}" \
+    && sha256sum -c task_checksums.txt --ignore-missing \
+    && tar zxf task_linux_${TARGETARCH}.tar.gz task \
     && mv task /usr/local/bin/task \
-    && chmod +x /usr/local/bin/task
+    && chmod +x /usr/local/bin/task \
+    && rm -f task_*
 
 # ######################################################################################################################
 # SETUP: CUSTOM (AS DEV USER)
