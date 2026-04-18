@@ -122,6 +122,8 @@ RUN case "${TARGETARCH}" in \
 # ----------------------------------------------------------------------------------------------------------------------
 
 RUN export DEBIAN_FRONTEND="noninteractive" \
+    && apt-get update \
+    && apt-get -y install --no-install-recommends ca-certificates curl \
     && mkdir -p /etc/apt/keyrings \
     && curl -sOL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
 	&& mv githubcli-archive-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg \
@@ -131,8 +133,6 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     && apt-get update \
     && apt-get -y install --no-install-recommends \
     build-essential \
-    ca-certificates \
-    curl \
     direnv \
     gdb \
     gh \
