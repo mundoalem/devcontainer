@@ -53,7 +53,6 @@ This image can be used as a development environment ready for:
 
 | Tool | Version |
 |------|---------|
-
 | [Hadolint](https://github.com/hadolint/hadolint) | 2.14.0 |
 | [Checkov](https://www.checkov.io/) | 3.2.519 |
 
