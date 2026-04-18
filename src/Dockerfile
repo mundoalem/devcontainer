@@ -398,6 +398,34 @@ RUN curl -sOL "${URL_TASK}" \
     && chmod +x /usr/local/bin/task \
     && rm -f task_*
 
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL GOENV
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_GOENV="3.0.1"
+ENV URL_GOENV="https://github.com/go-nv/goenv/releases/download/${VERSION_GOENV}/goenv_${VERSION_GOENV}_linux_${TARGETARCH}.tar.gz"
+ENV URL_GOENV_CHECKSUMS="https://github.com/go-nv/goenv/releases/download/${VERSION_GOENV}/goenv_${VERSION_GOENV}_checksums.txt"
+ENV GOENV_ROOT="${HOME}/.goenv"
+ENV PATH="${GOENV_ROOT}/bin:${PATH}"
+
+#
+# INSTALL
+#
+
+RUN curl -sOL ${URL_GOENV_CHECKSUMS} \
+    && curl -sOL ${URL_GOENV} \
+    && sha256sum -c "goenv_${VERSION_GOENV}_checksums.txt" --ignore-missing \
+    && tar -xvf "goenv_${VERSION_GOENV}_linux_${TARGETARCH}.tar.gz" goenv \
+    && chmod +x goenv \
+    && mv goenv /usr/local/bin/ \
+    && rm -f goenv_* \
+    && echo "eval \"\$(goenv init -)\"" >> "${HOME}/.bashrc" \
+    && echo "export PATH=\"\$GOPATH/bin:\$GOROOT/bin:\$PATH\"" >> "${HOME}/.bashrc"
+
 # ######################################################################################################################
 # SETUP: CUSTOM (AS DEV USER)
 # ######################################################################################################################
@@ -447,25 +475,6 @@ RUN curl -fsSL -o /tmp/install.sh https://claude.ai/install.sh \
     && /tmp/install.sh "${VERSION_CLAUDE}" \
     && rm -f /tmp/install.sh \
     && uv tool install specify-cli --from "git+https://github.com/github/spec-kit.git@da4f095a49b4adbb39e57966a5da6c686db0152d" # v0.7.3
-
-# ----------------------------------------------------------------------------------------------------------------------
-# INSTALL GOENV
-# ----------------------------------------------------------------------------------------------------------------------
-
-#
-# ENV
-#
-
-ENV GOENV_ROOT="${HOME}/.goenv"
-ENV PATH="${GOENV_ROOT}/bin:${PATH}"
-
-#
-# INSTALL
-#
-
-RUN git clone https://github.com/go-nv/goenv.git "${HOME}/.goenv" \
-    && echo "eval \"\$(goenv init -)\"" >> "${HOME}/.bashrc" \
-    && echo "export PATH=\"\$GOPATH/bin:\$GOROOT/bin:\$PATH\"" >> "${HOME}/.bashrc"
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL NVM
