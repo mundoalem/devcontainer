@@ -16,17 +16,15 @@ A Docker-based development environment for [Visual Studio Code](https://code.vis
 
 | Tool | Version |
 |------|---------|
-| [Task](https://taskfile.dev/) | 3.49.1 |
-| [direnv](https://direnv.net/) | 2.32.1 |
-| [uv](https://docs.astral.sh/uv/) | 0.11.6 |
-| [pipx](https://pipx.pypa.io/) | 1.4.3 |
+| [Task](https://taskfile.dev/) | 3.50.0 |
+| [uv](https://docs.astral.sh/uv/) | 0.11.7 |
 
 ### Language Version Managers
 
 | Tool | Version |
 |------|---------|
 | [Pyenv](https://github.com/pyenv/pyenv) | 2.6.27 |
-| [Goenv](https://github.com/go-nv/goenv) | 2.2.40 |
+| [Goenv](https://github.com/go-nv/goenv) | 3.0.1 |
 | [NVM](https://github.com/nvm-sh/nvm) | 0.40.4 |
 
 ### Infrastructure as Code
@@ -42,6 +40,7 @@ A Docker-based development environment for [Visual Studio Code](https://code.vis
 
 | Tool | Version |
 |------|---------|
+| [Cosign](https://github.com/sigstore/cosign) | 3.0.6 |
 | [Hadolint](https://github.com/hadolint/hadolint) | 2.14.0 |
 | [Checkov](https://www.checkov.io/) | 3.2.519 |
 
@@ -50,6 +49,7 @@ A Docker-based development environment for [Visual Studio Code](https://code.vis
 | Tool | Version |
 |------|---------|
 | [Claude Code](https://claude.ai/code) | 2.1.104 |
+| [specify-cli](https://github.com/github/spec-kit) | 0.7.3 |
 
 ## License
 

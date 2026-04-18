@@ -33,7 +33,7 @@
 # BASE IMAGE
 # ----------------------------------------------------------------------------------------------------------------------
 
-FROM ubuntu:24.04
+FROM ubuntu:24.04@sha256:84e77dee7d1bc93fb029a45e3c6cb9d8aa4831ccfcc7103d36e876938d28895b
 
 # ----------------------------------------------------------------------------------------------------------------------
 # ARGUMENTS
@@ -112,6 +112,11 @@ SHELL [ "/bin/bash", "-o", "pipefail", "-c" ]
 
 WORKDIR /
 
+RUN case "${TARGETARCH}" in \
+        amd64|arm64) ;; \
+        *) echo "Unsupported arch: ${TARGETARCH}" && exit 1 ;; \
+    esac
+
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL SYSTEM PACKAGES
 # ----------------------------------------------------------------------------------------------------------------------
@@ -156,9 +161,37 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     wget \
     xz-utils \
     zlib1g-dev \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -sOL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+	&& mv githubcli-archive-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& mkdir -p /etc/apt/sources.list.d \
+	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+	&& apt-get update \
+	&& apt-get -y install --no-install-recommends gh \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL COSIGN
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# INSTALL
+#
+
+COPY --from=ghcr.io/sigstore/cosign/cosign:v3.0.6@sha256:de9c65609e6bde17e6b48de485ee788407c9502fa08b8f4459f595b21f56cd00 /ko-app/cosign /usr/local/bin/cosign
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTAL UV
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# INSTALL
+#
+
+COPY --from=ghcr.io/astral-sh/uv:0.11.7@sha256:240fb85ab0f263ef12f492d8476aa3a2e4e1e333f7d67fbdd923d00a506a516a /uv /uvx /usr/local/bin/
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE LOCALISATION
@@ -184,14 +217,21 @@ RUN locale-gen "${DEFAULT_LANG}" \
 #
 
 ENV VERSION_HADOLINT="2.14.0"
-ENV URL_HADOLINT="https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-Linux-${TARGETARCH}"
 
 #
 # INSTALL
 #
 
-RUN curl -sSL -o /usr/local/bin/hadolint "${URL_HADOLINT}" \
-    && chmod +x /usr/local/bin/hadolint
+RUN case "${TARGETARCH}" in \
+        amd64) cpuarch="x86_64" ;; \
+        *) cpuarch="${TARGETARCH}" ;; \
+    esac \
+    && curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${cpuarch}" \
+    && curl -sOL "https://github.com/hadolint/hadolint/releases/download/v${VERSION_HADOLINT}/hadolint-linux-${cpuarch}.sha256" \
+    && sha256sum -c "hadolint-linux-${cpuarch}.sha256" \
+    && mv "hadolint-linux-${cpuarch}" /usr/local/bin/hadolint \
+    && chmod +x /usr/local/bin/hadolint \
+    && rm -f /tmp/hadolint-*
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TENV
@@ -203,14 +243,37 @@ RUN curl -sSL -o /usr/local/bin/hadolint "${URL_HADOLINT}" \
 
 ENV VERSION_TENV="4.10.1"
 ENV URL_TENV="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb"
+ENV URL_TENV_PEM="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb.pem"
+ENV URL_TENV_SIG="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_${TARGETARCH}.deb.sig"
+ENV URL_TENV_CHECKSUMS="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_checksums.txt"
+ENV URL_TENV_CHECKSUMS_SIG="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_checksums.txt.sig"
+ENV URL_TENV_CHECKSUMS_PEM="https://github.com/tofuutils/tenv/releases/download/v${VERSION_TENV}/tenv_v${VERSION_TENV}_checksums.txt.pem"
 
 #
 # INSTALL
 #
 
-RUN curl -fsSL -o /tmp/tenv.deb "${URL_TENV}" \
-    && dpkg -i /tmp/tenv.deb \
-    && rm -f /tmp/tenv.deb
+RUN curl -sOL "${URL_TENV_CHECKSUMS}" \
+    && curl -sOL "${URL_TENV_CHECKSUMS_SIG}" \
+    && curl -sOL "${URL_TENV_CHECKSUMS_PEM}" \
+    && curl -sOL "${URL_TENV}" \
+    && curl -sOL "${URL_TENV_PEM}" \
+    && curl -sOL "${URL_TENV_SIG}" \
+    && cosign verify-blob \
+        --certificate-identity "https://github.com/tofuutils/tenv/.github/workflows/release.yml@refs/tags/v${VERSION_TENV}" \
+        --signature "tenv_v${VERSION_TENV}_checksums.txt.sig" \
+        --certificate "tenv_v${VERSION_TENV}_checksums.txt.pem" \
+        --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+        "tenv_v${VERSION_TENV}_checksums.txt" \
+    && cosign verify-blob \
+        --certificate-identity "https://github.com/tofuutils/tenv/.github/workflows/release.yml@refs/tags/v${VERSION_TENV}" \
+        --signature "tenv_v${VERSION_TENV}_${TARGETARCH}.deb.sig" \
+        --certificate "tenv_v${VERSION_TENV}_${TARGETARCH}.deb.pem" \
+        --certificate-oidc-issuer "https://token.actions.githubusercontent.com" \
+        "tenv_v${VERSION_TENV}_${TARGETARCH}.deb" \
+    && sha256sum -c "tenv_v${VERSION_TENV}_checksums.txt" --ignore-missing \
+    && dpkg -i "tenv_v${VERSION_TENV}_${TARGETARCH}.deb" \
+    && rm -f tenv_*
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL TERRAFORM-DOCS
@@ -221,17 +284,20 @@ RUN curl -fsSL -o /tmp/tenv.deb "${URL_TENV}" \
 #
 
 ENV VERSION_TERRAFORM_DOCS="0.22.0"
-ENV URL_TERRAFORM_DOCS="https://terraform-docs.io/dl/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz"
+ENV URL_TERRAFORM_DOCS="https://github.com/terraform-docs/terraform-docs/releases/download/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz"
+ENV URL_TERRAFORM_DOCS_SHA256="https://github.com/terraform-docs/terraform-docs/releases/download/v${VERSION_TERRAFORM_DOCS}/terraform-docs-v${VERSION_TERRAFORM_DOCS}.sha256sum"
 
 #
 # INSTALL
 #
 
-RUN curl -sSLo ./terraform-docs.tar.gz "${URL_TERRAFORM_DOCS}" \
-    && tar -xf terraform-docs.tar.gz \
+RUN curl -sLO "${URL_TERRAFORM_DOCS_SHA256}" \
+    && curl -sLO "${URL_TERRAFORM_DOCS}" \
+    && sha256sum -c "terraform-docs-v${VERSION_TERRAFORM_DOCS}.sha256sum" --ignore-missing \
+    && tar -xf "terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz" \
     && chmod +x terraform-docs \
     && mv terraform-docs /usr/local/bin/ \
-    && rm -f ./terraform-docs.tar.gz
+    && rm -f terraform-docs-*
 
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -244,16 +310,20 @@ RUN curl -sSLo ./terraform-docs.tar.gz "${URL_TERRAFORM_DOCS}" \
 
 ENV VERSION_TFLINT="0.61.0"
 ENV URL_TFLINT="https://github.com/terraform-linters/tflint/releases/download/v${VERSION_TFLINT}/tflint_linux_${TARGETARCH}.zip"
+ENV URL_TFLINT_CHECKSUMS="https://github.com/terraform-linters/tflint/releases/download/v${VERSION_TFLINT}/checksums.txt"
 
 #
 # INSTALL
 #
 
-RUN curl -sSLo ./tflint.zip "${URL_TFLINT}" \
-    && unzip ./tflint.zip \
+
+RUN curl -sOL "${URL_TFLINT}" \
+    && curl -sOL "${URL_TFLINT_CHECKSUMS}" \
+    && sha256sum -c checksums.txt --ignore-missing \
+    && unzip "./tflint_linux_${TARGETARCH}.zip" \
     && chmod +x tflint \
     && mv tflint /usr/local/bin \
-    && rm -f ./tflint.zip
+    && rm -f ./tflint* checksums.txt
 
 # ----------------------------------------------------------------------------------------------------------------------
 # CREATE DEV USER
@@ -290,8 +360,18 @@ ENV VERSION_ALEJANDRA=4.0.0
 # INSTALL
 #
 
-RUN export cpuarch=$(arch | sed s/arm64/aarch64/) \
+RUN case "${TARGETARCH}" in \
+        arm64) \
+            cpuarch="aarch64"; \
+            checksum="a30b0d54ee3f0d6633d0398b50258408d2cc31646a9c8c4ba3ee4ebf2cebd8c8" ;; \
+        amd64) \
+            cpuarch="x86_64"; \
+            checksum="a23b9d47cba945805c6169541046de890e94e07a5aa416c86dee15bca2da6216" ;; \
+        *) \
+            echo "Unsupported arch: ${TARGETARCH}" && exit 1 ;; \
+    esac \
     && curl -fsSL -o /usr/local/bin/alejandra "https://github.com/kamadorueda/alejandra/releases/download/${VERSION_ALEJANDRA}/alejandra-${cpuarch}-unknown-linux-musl" \
+    && echo "${checksum}  /usr/local/bin/alejandra" | sha256sum -c - \
     && chmod +x /usr/local/bin/alejandra
 
 # ----------------------------------------------------------------------------------------------------------------------
@@ -302,15 +382,47 @@ RUN export cpuarch=$(arch | sed s/arm64/aarch64/) \
 # ENV
 #
 
-ENV VERSION_TASK=3.49.1
+ENV VERSION_TASK=3.50.0
+ENV URL_TASK="https://github.com/go-task/task/releases/download/v${VERSION_TASK}/task_linux_${TARGETARCH}.tar.gz"
+ENV URL_TASK_CHECKSUMS="https://github.com/go-task/task/releases/download/v${VERSION_TASK}/task_checksums.txt"
 
 #
 # INSTALL
 #
 
-RUN curl -fsSL "https://github.com/go-task/task/releases/download/v${VERSION_TASK}/task_linux_${TARGETARCH}.tar.gz" | tar zxf - task \
+RUN curl -sOL "${URL_TASK}" \
+    && curl -sOL "${URL_TASK_CHECKSUMS}" \
+    && sha256sum -c task_checksums.txt --ignore-missing \
+    && tar zxf task_linux_${TARGETARCH}.tar.gz task \
     && mv task /usr/local/bin/task \
-    && chmod +x /usr/local/bin/task
+    && chmod +x /usr/local/bin/task \
+    && rm -f task_*
+
+# ----------------------------------------------------------------------------------------------------------------------
+# INSTALL GOENV
+# ----------------------------------------------------------------------------------------------------------------------
+
+#
+# ENV
+#
+
+ENV VERSION_GOENV="3.0.1"
+ENV URL_GOENV="https://github.com/go-nv/goenv/releases/download/${VERSION_GOENV}/goenv_${VERSION_GOENV}_linux_${TARGETARCH}.tar.gz"
+ENV URL_GOENV_CHECKSUMS="https://github.com/go-nv/goenv/releases/download/${VERSION_GOENV}/goenv_${VERSION_GOENV}_checksums.txt"
+
+#
+# INSTALL
+#
+
+RUN curl -sOL ${URL_GOENV_CHECKSUMS} \
+    && curl -sOL ${URL_GOENV} \
+    && sha256sum -c "goenv_${VERSION_GOENV}_checksums.txt" --ignore-missing \
+    && tar -xvf "goenv_${VERSION_GOENV}_linux_${TARGETARCH}.tar.gz" goenv \
+    && chmod +x goenv \
+    && mv goenv /usr/local/bin/ \
+    && rm -f goenv_* \
+    && echo "eval \"\$(goenv init -)\"" >> "${HOME}/.bashrc" \
+    && echo "export PATH=\"\$GOPATH/bin:\$GOROOT/bin:\$PATH\"" >> "${HOME}/.bashrc"
 
 # ######################################################################################################################
 # SETUP: CUSTOM (AS DEV USER)
@@ -328,9 +440,10 @@ ENV HOME="/home/${DEFAULT_USER}"
 ENV LANG="${DEFAULT_LANG}"
 ENV LANGUAGE="${DEFAULT_LANG}"
 ENV LC_ALL="${DEFAULT_LANG}"
-ENV PATH="${HOME}/.local/bin:${PATH}"
 ENV PROMPT_COMMAND="history -a"
 ENV HISTFILE="${HOME}/.history/.bash_history"
+ENV GOENV_ROOT="${HOME}/.goenv"
+ENV PATH="${HOME}/.local/bin:${GOENV_ROOT}/bin:${PATH}"
 
 #
 # GENERAL
@@ -342,7 +455,7 @@ RUN mkdir -p "${HOME}/.config" \
     && mkdir -p "${HOME}/.local/bin"
 
 # ----------------------------------------------------------------------------------------------------------------------
-# INSTALL CLAUDE
+# INSTALL CLAUDE AND SPEC-KIT
 # ----------------------------------------------------------------------------------------------------------------------
 
 #
@@ -355,26 +468,12 @@ ENV VERSION_CLAUDE="2.1.104"
 # INSTALL
 #
 
-RUN curl -fsSL https://claude.ai/install.sh | bash -s -- "${VERSION_CLAUDE}"
-
-# ----------------------------------------------------------------------------------------------------------------------
-# INSTALL GOENV
-# ----------------------------------------------------------------------------------------------------------------------
-
-#
-# ENV
-#
-
-ENV GOENV_ROOT="${HOME}/.goenv"
-ENV PATH="${GOENV_ROOT}/bin:${PATH}"
-
-#
-# INSTALL
-#
-
-RUN git clone https://github.com/go-nv/goenv.git "${HOME}/.goenv" \
-    && echo "eval \"\$(goenv init -)\"" >> "${HOME}/.bashrc" \
-    && echo "export PATH=\"\$GOPATH/bin:\$GOROOT/bin:\$PATH\"" >> "${HOME}/.bashrc"
+RUN curl -fsSL -o /tmp/install.sh https://claude.ai/install.sh \
+    && echo "b315b46925a9bfb9422f2503dd5aa649f680832f4c076b22d87c39d578c3d830  /tmp/install.sh" | sha256sum -c - \
+    && chmod +x /tmp/install.sh \
+    && /tmp/install.sh "${VERSION_CLAUDE}" \
+    && rm -f /tmp/install.sh \
+    && uv tool install specify-cli --from "git+https://github.com/github/spec-kit.git@da4f095a49b4adbb39e57966a5da6c686db0152d" # v0.7.3
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL NVM
@@ -391,7 +490,11 @@ ENV URL_NVM="https://raw.githubusercontent.com/nvm-sh/nvm/v${VERSION_NVM}/instal
 # INSTALL
 #
 
-RUN curl -o- "${URL_NVM}" | bash
+RUN curl -fsSL -o /tmp/install.sh "${URL_NVM}" \
+    && echo "4b7412c49960c7d31e8df72da90c1fb5b8cccb419ac99537b737028d497aba4f  /tmp/install.sh" | sha256sum -c - \
+    && chmod +x /tmp/install.sh \
+    && /tmp/install.sh \
+    && rm -f /tmp/install.sh
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL PYENV
@@ -401,6 +504,8 @@ RUN curl -o- "${URL_NVM}" | bash
 # ENV
 #
 
+ENV URL_PYENV="https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer"
+ENV VERSION_PYENV="2.6.27"
 ENV PYENV_ROOT="${HOME}/.pyenv"
 ENV PATH="${PYENV_ROOT}/bin:$PATH"
 
@@ -408,7 +513,11 @@ ENV PATH="${PYENV_ROOT}/bin:$PATH"
 # INSTALL
 #
 
-RUN curl -fsSL https://pyenv.run | bash \
+RUN curl -fsSL -o /tmp/pyenv-installer "${URL_PYENV}" \
+    && echo "4b0adf623a6205727163eb98610b6c5e63f23b99183948b874d867cd9b30ef13  /tmp/pyenv-installer" | sha256sum -c - \
+    && chmod +x /tmp/pyenv-installer \
+    && PYENV_GIT_TAG="v${VERSION_PYENV}" /tmp/pyenv-installer \
+    && rm -f /tmp/pyenv-installer \
     && echo "eval \"\$(pyenv init --path)\"" >> "${HOME}/.bashrc" \
     && echo "eval \"\$(pyenv virtualenv-init -)\"" >> "${HOME}/.bashrc"
 
@@ -429,12 +538,6 @@ ENV VERSION_CHECKOV="3.2.519"
 RUN pipx install "checkov==${VERSION_CHECKOV}"
 
 # ----------------------------------------------------------------------------------------------------------------------
-# INSTALL UV
-# ----------------------------------------------------------------------------------------------------------------------
-
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# ----------------------------------------------------------------------------------------------------------------------
 # CONFIGURE DIRENV
 # ----------------------------------------------------------------------------------------------------------------------
 
@@ -445,6 +548,12 @@ RUN echo "eval \"\$(direnv hook bash)\"" >> "${HOME}/.bashrc"
 # ----------------------------------------------------------------------------------------------------------------------
 
 RUN echo "alias ls=\"lsd\"" >> "${HOME}/.bashrc"
+
+# ----------------------------------------------------------------------------------------------------------------------
+# CONFIGURE GOENV
+# ----------------------------------------------------------------------------------------------------------------------
+
+RUN echo "eval \"\$(goenv init -)\"" >> "${HOME}/.bashrc"
 
 # ######################################################################################################################
 # RUN
