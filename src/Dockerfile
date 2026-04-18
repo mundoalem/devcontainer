@@ -528,7 +528,7 @@ RUN curl -fsSL -o /tmp/pyenv-installer "${URL_PYENV}" \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.2.519"
+ENV VERSION_CHECKOV="3.2.521"
 
 #
 # PYTHON
