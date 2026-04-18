@@ -73,3 +73,8 @@ Tests cover: user/group creation, sudo access, and presence of every installed t
 ## Dockerfile Linting Rules
 
 Hadolint is configured in `.hadolint.yaml` to ignore: `DL3008` (pin apt versions), `DL3050` (label schema), `DL3059` (consecutive RUNs), `SC2155` (declare/assign separately). Do not add suppressions inline; add them to `.hadolint.yaml` instead.
+
+<!-- SPECKIT START -->
+For additional context about technologies to be used, project structure,
+shell commands, and other important information, read the current plan
+<!-- SPECKIT END -->
