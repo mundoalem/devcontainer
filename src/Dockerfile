@@ -123,12 +123,19 @@ RUN case "${TARGETARCH}" in \
 
 RUN export DEBIAN_FRONTEND="noninteractive" \
     && apt-get update \
+    && apt-get -y install --no-install-recommends ca-certificates curl \
+    && mkdir -p /etc/apt/keyrings \
+    && curl -sOL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+	&& mv githubcli-archive-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+	&& mkdir -p /etc/apt/sources.list.d \
+	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update \
     && apt-get -y install --no-install-recommends \
     build-essential \
-    ca-certificates \
-    curl \
     direnv \
     gdb \
+    gh \
     git \
     git-extras \
     gnupg2 \
@@ -161,14 +168,6 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     wget \
     xz-utils \
     zlib1g-dev \
-    && mkdir -p /etc/apt/keyrings \
-    && curl -sOL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
-	&& mv githubcli-archive-keyring.gpg /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-	&& chmod go+r /etc/apt/keyrings/githubcli-archive-keyring.gpg \
-	&& mkdir -p /etc/apt/sources.list.d \
-	&& echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" > /etc/apt/sources.list.d/github-cli.list \
-	&& apt-get update \
-	&& apt-get -y install --no-install-recommends gh \
     && apt-get autoremove -y \
     && apt-get clean autoclean -y \
     && rm -r /var/cache/* /var/lib/apt/lists/*
@@ -291,8 +290,8 @@ ENV URL_TERRAFORM_DOCS_SHA256="https://github.com/terraform-docs/terraform-docs/
 # INSTALL
 #
 
-RUN curl -sLO "${URL_TERRAFORM_DOCS_SHA256}" \
-    && curl -sLO "${URL_TERRAFORM_DOCS}" \
+RUN curl -sOL "${URL_TERRAFORM_DOCS_SHA256}" \
+    && curl -sOL "${URL_TERRAFORM_DOCS}" \
     && sha256sum -c "terraform-docs-v${VERSION_TERRAFORM_DOCS}.sha256sum" --ignore-missing \
     && tar -xf "terraform-docs-v${VERSION_TERRAFORM_DOCS}-linux-${TARGETARCH}.tar.gz" \
     && chmod +x terraform-docs \
@@ -529,7 +528,7 @@ RUN curl -fsSL -o /tmp/pyenv-installer "${URL_PYENV}" \
 # ENV
 #
 
-ENV VERSION_CHECKOV="3.2.519"
+ENV VERSION_CHECKOV="3.2.521"
 
 #
 # PYTHON
