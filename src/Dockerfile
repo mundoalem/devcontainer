@@ -178,13 +178,17 @@ RUN export DEBIAN_FRONTEND="noninteractive" \
     && rm -r /var/cache/* /var/lib/apt/lists/*
 
 # ----------------------------------------------------------------------------------------------------------------------
-# COPY COSIGN BINARY FROM IMAGE
+# INSTALL COSIGN
 # ----------------------------------------------------------------------------------------------------------------------
 
-COPY --from=cosign-bin /ko-app/cosign /usr/local/bin/cosign
+#
+# INSTALL
+#
+
+COPY --from=ghcr.io/sigstore/cosign/cosign:v3.0.6@sha256:de9c65609e6bde17e6b48de485ee788407c9502fa08b8f4459f595b21f56cd00 /ko-app/cosign /usr/local/bin/cosign
 
 # ----------------------------------------------------------------------------------------------------------------------
-# COPY UV BINARY FROM IMAGE
+# INSTAL UV
 # ----------------------------------------------------------------------------------------------------------------------
 
 #
@@ -409,8 +413,6 @@ RUN curl -sOL "${URL_TASK}" \
 ENV VERSION_GOENV="3.0.1"
 ENV URL_GOENV="https://github.com/go-nv/goenv/releases/download/${VERSION_GOENV}/goenv_${VERSION_GOENV}_linux_${TARGETARCH}.tar.gz"
 ENV URL_GOENV_CHECKSUMS="https://github.com/go-nv/goenv/releases/download/${VERSION_GOENV}/goenv_${VERSION_GOENV}_checksums.txt"
-ENV GOENV_ROOT="${HOME}/.goenv"
-ENV PATH="${GOENV_ROOT}/bin:${PATH}"
 
 #
 # INSTALL
@@ -442,9 +444,10 @@ ENV HOME="/home/${DEFAULT_USER}"
 ENV LANG="${DEFAULT_LANG}"
 ENV LANGUAGE="${DEFAULT_LANG}"
 ENV LC_ALL="${DEFAULT_LANG}"
-ENV PATH="${HOME}/.local/bin:${PATH}"
 ENV PROMPT_COMMAND="history -a"
 ENV HISTFILE="${HOME}/.history/.bash_history"
+ENV GOENV_ROOT="${HOME}/.goenv"
+ENV PATH="${HOME}/.local/bin:${GOENV_ROOT}/bin:${PATH}"
 
 #
 # GENERAL
@@ -491,7 +494,11 @@ ENV URL_NVM="https://raw.githubusercontent.com/nvm-sh/nvm/v${VERSION_NVM}/instal
 # INSTALL
 #
 
-RUN curl -o- "${URL_NVM}" | bash
+RUN curl -fsSL -o /tmp/install.sh "${URL_NVM}" \
+    && echo "4b7412c49960c7d31e8df72da90c1fb5b8cccb419ac99537b737028d497aba4f  /tmp/install.sh" | sha256sum -c - \
+    && chmod +x /tmp/install.sh \
+    && /tmp/install.sh \
+    && rm -f /tmp/install.sh
 
 # ----------------------------------------------------------------------------------------------------------------------
 # INSTALL PYENV
@@ -501,6 +508,8 @@ RUN curl -o- "${URL_NVM}" | bash
 # ENV
 #
 
+ENV URL_PYENV="https://raw.githubusercontent.com/pyenv/pyenv-installer/master/bin/pyenv-installer"
+ENV VERSION_PYENV="2.6.27"
 ENV PYENV_ROOT="${HOME}/.pyenv"
 ENV PATH="${PYENV_ROOT}/bin:$PATH"
 
@@ -508,7 +517,11 @@ ENV PATH="${PYENV_ROOT}/bin:$PATH"
 # INSTALL
 #
 
-RUN curl -fsSL https://pyenv.run | bash \
+RUN curl -fsSL -o /tmp/pyenv-installer "${URL_PYENV}" \
+    && echo "4b0adf623a6205727163eb98610b6c5e63f23b99183948b874d867cd9b30ef13  /tmp/pyenv-installer" | sha256sum -c - \
+    && chmod +x /tmp/pyenv-installer \
+    && PYENV_GIT_TAG="v${VERSION_PYENV}" /tmp/pyenv-installer \
+    && rm -f /tmp/pyenv-installer \
     && echo "eval \"\$(pyenv init --path)\"" >> "${HOME}/.bashrc" \
     && echo "eval \"\$(pyenv virtualenv-init -)\"" >> "${HOME}/.bashrc"
 
